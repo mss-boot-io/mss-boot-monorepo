@@ -1,0 +1,14 @@
+project: mss-boot
+service: task
+ports:
+  - port: 9090
+    targetPort: 9090
+    name: grpc
+metrics:
+  scrape: true
+  port: 5000
+  path: /metrics
+hpa: false
+config:
+  - name: mss-boot-task-config
+    path: /app/cfg
