@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Rename
-        run: mkdir swagger && mv service/${{ matrix.service }}/docs/swagger.json swagger/${{ matrix.service }}.json
+        run: mkdir swagger && mv mss-boot/${{ matrix.service }}/docs/swagger.json swagger/${{ matrix.service }}.json
 
       - name: Upload Swagger
         uses: actions/upload-artifact@v3
