@@ -17,5 +17,5 @@ jobs:
       - name: 'Mirror to gitee'
         uses: pixta-dev/repository-mirroring-action@v1
         with:
-          target_repo_url: git@gitee.com:mss-boot-io/mss-boot.git
+          target_repo_url: git@gitee.com:mss-boot-io/mss-boot-monorepo.git
           ssh_private_key: ${{ secrets.ssh_private_key }}
