@@ -16,7 +16,7 @@ import (
 // @securityDefinitions.apikey Bearer
 // @in header
 // @name Authorization
-// @host localhost:9094
+// @host localhost:8080
 // @BasePath
 func main() {
 	ctx := context.Background()
