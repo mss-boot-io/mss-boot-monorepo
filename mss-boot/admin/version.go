@@ -21,8 +21,6 @@ const version = "0.0.1"
 var ver bool
 
 func init() {
-	flag.String("c", "cfg/admin.yaml",
-		"Read configuration from specified `FILE`, supports JSON/YAML/TOML formats")
 	flag.BoolVar(&ver, "v", false, "Print the server version information")
 	flag.Parse()
 	rand.Seed(time.Now().UnixNano())

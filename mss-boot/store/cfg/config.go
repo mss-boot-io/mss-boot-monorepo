@@ -8,6 +8,8 @@ import (
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 )
 
+var Cfg Config
+
 // Config config
 type Config struct {
 	Logger   config.Logger  `yaml:"logger" json:"logger"`
@@ -21,6 +23,11 @@ type Config struct {
 }
 
 func (e *Config) Init(handler func(srv *grpc.Server)) {
+	err := config.Init(Embedded, &Cfg)
+	if err != nil {
+		log.Fatalf("cfg init failed, %s\n", err.Error())
+	}
+
 	e.Logger.Init()
 	e.Provider.Init(e.Cache, e.Queue, e.Locker)
 

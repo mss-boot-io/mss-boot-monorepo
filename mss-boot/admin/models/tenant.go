@@ -9,9 +9,9 @@ package models
 
 import (
 	"context"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
 	"time"
 
-	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -78,13 +78,13 @@ func (e *Tenant) Make() {
 			System:      true,
 			Status:      enum.Enabled,
 			Description: "mss-boot-io",
-			Domains:     []string{"localhost:9094"},
+			Domains:     []string{"localhost:8080"},
 			Client: config.OAuth2{
-				Issuer:       viper.GetString("oauth2.issuer"),
-				ClientID:     viper.GetString("oauth2.clientID"),
-				ClientSecret: viper.GetString("oauth2.clientSecret"),
-				Scopes:       viper.GetStringSlice("oauth2.scopes"),
-				RedirectURL:  viper.GetString("oauth2.redirectURL"),
+				Issuer:       cfg.Cfg.OAuth2.Issuer,
+				ClientID:     cfg.Cfg.OAuth2.ClientID,
+				ClientSecret: cfg.Cfg.OAuth2.ClientSecret,
+				Scopes:       cfg.Cfg.OAuth2.Scopes,
+				RedirectURL:  cfg.Cfg.OAuth2.RedirectURL,
 			},
 			ExpiredAt: now.Add(time.Hour * 24 * 365 * 100),
 			CreatedAt: now,

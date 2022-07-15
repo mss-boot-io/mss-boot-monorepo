@@ -174,6 +174,8 @@ definitions:
     properties:
       appName:
         type: string
+      authCodeURL:
+        type: string
       clientId:
         type: string
       organizationName:
@@ -181,147 +183,10 @@ definitions:
       serverUrl:
         type: string
     type: object
-  form.TenantCreateReq:
-    properties:
-      contact:
-        description: 联系方式
-        type: string
-      description:
-        description: 描述
-        type: string
-      domains:
-        description: 域名
-        items:
-          type: string
-        type: array
-      email:
-        description: 邮箱
-        type: string
-      expiredAt:
-        description: 有效期
-        type: string
-      name:
-        description: 名称
-        type: string
-      status:
-        description: 状态
-        type: integer
-      system:
-        description: 系统管理
-        type: boolean
-    required:
-    - expiredAt
-    - name
-    type: object
-  form.TenantGetResp:
-    properties:
-      contact:
-        description: 联系方式
-        type: string
-      createdAt:
-        description: 创建时间
-        type: string
-      description:
-        description: 描述
-        type: string
-      domains:
-        description: 域名
-        items:
-          type: string
-        type: array
-      expiredAt:
-        description: 有效期
-        type: string
-      name:
-        description: 名称
-        type: string
-      status:
-        description: 状态
-        type: integer
-      system:
-        description: 系统管理
-        type: boolean
-      updatedAt:
-        description: 更新时间
-        type: string
-    required:
-    - expiredAt
-    type: object
-  form.TenantListItem:
-    properties:
-      contact:
-        description: 联系方式
-        type: string
-      createdAt:
-        description: 创建时间
-        type: string
-      description:
-        description: 描述
-        type: string
-      domains:
-        description: 域名
-        items:
-          type: string
-        type: array
-      expiredAt:
-        description: 有效期
-        type: string
-      id:
-        description: id
-        type: string
-      name:
-        description: 名称
-        type: string
-      status:
-        description: 状态
-        type: integer
-      system:
-        description: 系统管理
-        type: boolean
-      updatedAt:
-        description: 更新时间
-        type: string
-    required:
-    - expiredAt
-    type: object
-  form.TenantUpdateReq:
-    properties:
-      contact:
-        description: 联系方式
-        type: string
-      description:
-        description: 描述
-        type: string
-      domains:
-        description: 域名
-        items:
-          type: string
-        type: array
-      email:
-        description: 邮箱
-        type: string
-      expiredAt:
-        description: 有效期
-        type: string
-      name:
-        description: 名称
-        type: string
-    required:
-    - expiredAt
-    type: object
   jwt.NumericDate:
     properties:
       time.Time:
         type: string
-    type: object
-  response.Page:
-    properties:
-      current:
-        type: integer
-      pageSize:
-        type: integer
-      total:
-        type: integer
     type: object
   response.Response:
     properties:
@@ -338,14 +203,13 @@ definitions:
       traceId:
         type: string
     type: object
-host: localhost:9094
 info:
   contact: {}
-  description: tenant接口文档
+  description: admin接口文档
   title: admin API
   version: 0.0.1
 paths:
-  /tenant/api/v1/callback:
+  /admin/api/v1/callback:
     get:
       consumes:
       - application/json
@@ -382,7 +246,7 @@ paths:
       summary: 获取access_token
       tags:
       - admin
-  /tenant/api/v1/client:
+  /admin/api/v1/client:
     get:
       consumes:
       - application/json
@@ -391,13 +255,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/form.TenantClientResp'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.TenantClientResp'
+              type: object
       security:
       - Bearer: []
       summary: 获取client配置
       tags:
       - admin
-  /tenant/api/v1/current-user:
+  /admin/api/v1/current-user:
     get:
       consumes:
       - application/json
@@ -406,13 +275,18 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/auth.Claims'
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/auth.Claims'
+              type: object
       security:
       - Bearer: []
       summary: 获取当前用户
       tags:
       - admin
-  /tenant/api/v1/refresh-token:
+  /admin/api/v1/refresh-token:
     get:
       consumes:
       - application/json
@@ -435,129 +309,6 @@ paths:
       security:
       - Bearer: []
       summary: 获取accessToken
-      tags:
-      - admin
-  /tenant/api/v1/tenant:
-    get:
-      consumes:
-      - application/json
-      description: 列表tenant
-      parameters:
-      - description: 租户名称
-        in: query
-        name: name
-        type: string
-      - description: 当前页
-        in: query
-        name: page
-        type: string
-      - description: 每页容量
-        in: query
-        name: pageSize
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Page'
-            - properties:
-                data:
-                  items:
-                    $ref: '#/definitions/form.TenantListItem'
-                  type: array
-              type: object
-      security:
-      - Bearer: []
-      summary: 列表tenant
-      tags:
-      - admin
-    post:
-      consumes:
-      - application/json
-      description: 创建tenant
-      parameters:
-      - description: data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/form.TenantCreateReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: 创建tenant
-      tags:
-      - admin
-  /tenant/api/v1/tenant/{id}:
-    delete:
-      consumes:
-      - application/json
-      description: 删除tenant
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: 删除tenant
-      tags:
-      - admin
-    get:
-      consumes:
-      - application/json
-      description: 获取tenant
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/form.TenantGetResp'
-      security:
-      - Bearer: []
-      summary: 获取tenant
-      tags:
-      - admin
-    put:
-      consumes:
-      - application/json
-      description: 更新tenant
-      parameters:
-      - description: id
-        in: path
-        name: id
-        required: true
-        type: string
-      - description: data
-        in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/form.TenantUpdateReq'
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.Response'
-      security:
-      - Bearer: []
-      summary: 更新tenant
       tags:
       - admin
 securityDefinitions:

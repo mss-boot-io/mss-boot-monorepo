@@ -12,4 +12,15 @@
 *.out
 
 # Dependency directories (remove the comment below to include it)
-# vendor/
+vendor/
+
+temp/
+
+### goland ###
+.idea
+
+### vscode ###
+.vscode
+
+go.work
+go.work.sum
