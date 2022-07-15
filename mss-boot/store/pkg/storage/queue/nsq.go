@@ -10,6 +10,8 @@ package queue
 import (
 	"encoding/json"
 
+	"github.com/nsqio/go-nsq"
+
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/pkg/storage"
 )
 

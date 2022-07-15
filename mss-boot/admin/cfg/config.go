@@ -17,6 +17,8 @@ import (
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 )
 
+var Cfg Config
+
 type Config struct {
 	Logger   config.Logger    `yaml:"logger" json:"logger"`
 	Server   config.Listen    `yaml:"server" json:"server"`
@@ -28,6 +30,11 @@ type Config struct {
 }
 
 func (e *Config) Init(handler http.Handler) {
+	err := config.Init(Embedded, &Cfg)
+	if err != nil {
+		log.Fatalf("cfg init failed, %s\n", err.Error())
+	}
+
 	e.Logger.Init()
 	e.Database.Init()
 

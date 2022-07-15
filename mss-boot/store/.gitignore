@@ -15,9 +15,6 @@
 # Dependency directories (remove the comment below to include it)
 vendor/
 
-cfg/*.yaml
-cfg/*.yml
-
 ### IntelliJ project files
 .idea
 *.iml

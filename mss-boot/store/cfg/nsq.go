@@ -11,9 +11,11 @@ import (
 	"errors"
 	"time"
 
+	"github.com/mss-boot-io/mss-boot/pkg/config"
+	"github.com/nsqio/go-nsq"
+
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/pkg/storage"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/pkg/storage/queue"
-	"github.com/mss-boot-io/mss-boot/pkg/config"
 )
 
 type NSQ struct {
