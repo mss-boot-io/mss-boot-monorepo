@@ -1,0 +1,24 @@
+###
+GET http://localhost:8081/generator/api/v1/template/get-params?source=https://github.com/WhiteMatrixTech/matrix-microservice-template&path=grpc-service&branch=feat/kafka
+
+###
+POST http://localhost:8081/generator/api/v1/template/generate
+Content-Type: application/json
+
+{
+  "generate": {
+    "params": {
+      "artifactId": "test",
+      "groupId": "test",
+      "projectName": "test",
+      "serviceName": "test"
+    },
+    "repo": "https://github.com/lwnmengjing/generate-test",
+    "service": "user-service"
+  },
+  "template": {
+    "branch": "feat/kafka",
+    "path": "grpc-service",
+    "source": "https://github.com/WhiteMatrixTech/matrix-microservice-template"
+  }
+}
