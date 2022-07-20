@@ -8,7 +8,6 @@
 package cfg
 
 import (
-	"github.com/mss-boot-io/mss-boot/pkg/config/source/s3"
 	"net/http"
 	"time"
 
@@ -16,6 +15,7 @@ import (
 	"github.com/mss-boot-io/mss-boot/core/server"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
+	"github.com/mss-boot-io/mss-boot/pkg/config/source/s3"
 )
 
 var Cfg Config
