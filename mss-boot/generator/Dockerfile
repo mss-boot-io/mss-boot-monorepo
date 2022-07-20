@@ -1,6 +1,6 @@
 FROM alpine:latest
 WORKDIR /app
-ADD admin application
+ADD generator application
 COPY ../../bin/docker-start.sh .
 COPY cfg/*.yaml ./cfg/
 

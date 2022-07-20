@@ -46,7 +46,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v3
         with:
-          context: mss-boot/${{ matrix.service }}/Dockerfile
+          context: mss-boot/${{ matrix.service }}
 #          push: ${{ github.event_name != 'pull_request' }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
