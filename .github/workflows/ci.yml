@@ -41,7 +41,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v4
         with:
-          images: ${IMAGE_NAME}/devops-${{ matrix.service }}
+          images: '${IMAGE_NAME}/devops-${{ matrix.service }}'
           flavor: |
             latest=auto
           tags: |
