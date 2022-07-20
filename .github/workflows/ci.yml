@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [admin, generator, store]
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Build
+        working-directory: mss-boot/${{ matrix.service }}
+        run: go build -o ${{ matrix.service }} .
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{ github.repository }}-${{ matrix.service }}
+          flavor: |
+            latest=auto
+          tags: |
+            type=schedule
+            type=ref,event=tag
+            type=sha,prefix=,format=long,enable=true,priority=100
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: mss-boot/${{ matrix.service }}/Dockerfile
+#          push: ${{ github.event_name != 'pull_request' }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}

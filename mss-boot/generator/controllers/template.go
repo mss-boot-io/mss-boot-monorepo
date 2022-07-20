@@ -116,8 +116,6 @@ func (e Template) Generate(c *gin.Context) {
 		"http://",
 		"",
 	))
-	fmt.Println(req.Template.Source)
-	fmt.Println(req.Template.Branch)
 	//获取新代码
 	_, err = pkg.GitClone(
 		req.Template.Source,
