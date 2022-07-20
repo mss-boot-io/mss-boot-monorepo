@@ -15,27 +15,24 @@ import (
 	"github.com/mss-boot-io/mss-boot/core/server"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
-	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/config/source/s3"
 )
 
 var Cfg Config
 
 type Config struct {
-	Logger   config.Logger    `yaml:"logger" json:"logger"`
-	Server   config.Listen    `yaml:"server" json:"server"`
-	Health   *config.Listen   `yaml:"health" json:"health"`
-	Metrics  *config.Listen   `yaml:"metrics" json:"metrics"`
-	Clients  config.Clients   `yaml:"clients" json:"clients"`
-	Database mongodb.Database `yaml:"database" json:"database"`
-	OAuth2   config.OAuth2    `yaml:"oauth2" json:"oauth2"`
+	Logger  config.Logger  `yaml:"logger" json:"logger"`
+	Server  config.Listen  `yaml:"server" json:"server"`
+	Health  *config.Listen `yaml:"health" json:"health"`
+	Metrics *config.Listen `yaml:"metrics" json:"metrics"`
+	Github  Github         `yaml:"github" json:"github"`
 }
 
 func (e *Config) Init(handler http.Handler) {
 	configSource, err := s3.New(
 		"ap-northeast-1",
 		"matrix-config-center",
-		"mss-boot-io/mss-boot-monorepo/admin",
+		"mss-boot-io/mss-boot-monorepo/generator",
 		5*time.Second)
 	if err != nil {
 		log.Fatalf("cfg(s3) init failed, %s\n", err.Error())
@@ -47,7 +44,6 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	e.Logger.Init()
-	e.Database.Init()
 
 	runnable := []server.Runnable{
 		listener.New("admin",
@@ -61,10 +57,4 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	server.Manage.Add(runnable...)
-}
-
-func (e *Config) OnChange() {
-	e.Logger.Init()
-	e.Database.Init()
-	log.Info("!!! cfg change and reload")
 }

@@ -1,0 +1,132 @@
+definitions:
+  form.GenerateParams:
+    properties:
+      params:
+        additionalProperties:
+          type: string
+        type: object
+      repo:
+        type: string
+    required:
+    - repo
+    type: object
+  form.TemplateGenerateReq:
+    properties:
+      generate:
+        $ref: '#/definitions/form.GenerateParams'
+      template:
+        $ref: '#/definitions/form.TemplateParams'
+    type: object
+  form.TemplateGenerateResp:
+    properties:
+      branch:
+        type: string
+      repo:
+        type: string
+    type: object
+  form.TemplateGetParamsResp:
+    properties:
+      params:
+        additionalProperties:
+          type: string
+        type: object
+    type: object
+  form.TemplateParams:
+    properties:
+      branch:
+        type: string
+      path:
+        type: string
+      source:
+        type: string
+    required:
+    - source
+    type: object
+  response.Response:
+    properties:
+      errorCode:
+        type: string
+      errorMessage:
+        type: string
+      host:
+        type: string
+      showType:
+        type: integer
+      success:
+        type: boolean
+      traceId:
+        type: string
+    type: object
+info:
+  contact: {}
+  description: generator接口文档
+  title: generator API
+  version: 0.0.1
+paths:
+  /generator/api/v1/template/generate:
+    post:
+      consumes:
+      - application/json
+      description: 从模版生成代码
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/form.TemplateGenerateReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.TemplateGenerateResp'
+              type: object
+      security:
+      - Bearer: []
+      summary: 从模版生成代码
+      tags:
+      - admin
+  /generator/api/v1/template/get-params:
+    get:
+      consumes:
+      - application/json
+      description: 获取template参数配置
+      parameters:
+      - description: template source
+        in: query
+        name: source
+        required: true
+        type: string
+      - description: branch default:HEAD
+        in: query
+        name: branch
+        type: string
+      - description: path default:.
+        in: query
+        name: path
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.TemplateGetParamsResp'
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取template参数配置
+      tags:
+      - admin
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

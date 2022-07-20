@@ -43,6 +43,9 @@ type Menu struct {
 // @Success 200 {object} response.Response
 // @Router /admin/api/v1/menu [post]
 // @Security Bearer
+func (e Menu) Create(c *gin.Context) {
+	e.DefaultController.Create(c)
+}
 
 // Update 更新
 // @Summary 更新menu
@@ -55,6 +58,9 @@ type Menu struct {
 // @Success 200 {object} response.Response
 // @Router /admin/api/v1/menu/{id} [put]
 // @Security Bearer
+func (e Menu) Update(c *gin.Context) {
+	e.DefaultController.Update(c)
+}
 
 // Delete 删除
 // @Summary 删除menu
@@ -66,6 +72,9 @@ type Menu struct {
 // @Success 200 {object} response.Response
 // @Router /admin/api/v1/menu/{id} [delete]
 // @Security Bearer
+func (e Menu) Delete(c *gin.Context) {
+	e.DefaultController.Delete(c)
+}
 
 // Get 获取
 // @Summary 获取menu
@@ -77,6 +86,9 @@ type Menu struct {
 // @Success 200 {object} response.Response{data=form.menuGetResp}
 // @Router /admin/api/v1/menu/{id} [get]
 // @Security Bearer
+func (e Menu) Get(c *gin.Context) {
+	e.DefaultController.Get(c)
+}
 
 // List 列表
 // @Summary 列表menu
@@ -90,6 +102,9 @@ type Menu struct {
 // @Success 200 {object} response.Page{data=[]form.menuListItem}
 // @Router /admin/api/v1/menu [get]
 // @Security Bearer
+func (e Menu) List(c *gin.Context) {
+	e.DefaultController.List(c)
+}
 
 func (e *Menu) Other(r *gin.RouterGroup) {
 }

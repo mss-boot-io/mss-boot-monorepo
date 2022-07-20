@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        service: [admin]
+        service: [admin, generator]
     steps:
       - uses: actions/checkout@v3
 
