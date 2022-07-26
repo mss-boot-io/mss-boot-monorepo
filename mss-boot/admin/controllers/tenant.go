@@ -8,7 +8,6 @@
 package controllers
 
 import (
-	"github.com/mss-boot-io/mss-boot/pkg/store"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,11 +16,12 @@ import (
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/form"
 	"github.com/mss-boot-io/mss-boot/pkg/response"
 	"github.com/mss-boot-io/mss-boot/pkg/response/curd"
+	"github.com/mss-boot-io/mss-boot/pkg/store"
 )
 
 func init() {
 	e := &Tenant{}
-	e.TableName = "admin"
+	e.TableName = "tenant"
 	e.Auth = true
 	e.CreateReq = &form.TenantCreateReq{}
 	e.UpdateReq = &form.TenantUpdateReq{}
@@ -45,7 +45,7 @@ type Tenant struct {
 // @Product application/json
 // @Param data body form.TenantCreateReq true "data"
 // @Success 200 {object} response.Response
-// @Router /admin/api/v1/admin [post]
+// @Router /admin/api/v1/tenant [post]
 // @Security Bearer
 func (e Tenant) Create(c *gin.Context) {
 	e.DefaultController.Create(c)
@@ -60,7 +60,7 @@ func (e Tenant) Create(c *gin.Context) {
 // @Param id path string true "id"
 // @Param data body form.TenantUpdateReq true "data"
 // @Success 200 {object} response.Response
-// @Router /admin/api/v1/admin/{id} [put]
+// @Router /admin/api/v1/tenant/{id} [put]
 // @Security Bearer
 func (e Tenant) Update(c *gin.Context) {
 	e.DefaultController.Update(c)
@@ -74,7 +74,7 @@ func (e Tenant) Update(c *gin.Context) {
 // @Product application/json
 // @Param id path string true "id"
 // @Success 200 {object} response.Response
-// @Router /admin/api/v1/admin/{id} [delete]
+// @Router /admin/api/v1/tenant/{id} [delete]
 // @Security Bearer
 func (e Tenant) Delete(c *gin.Context) {
 	e.DefaultController.Delete(c)
@@ -88,7 +88,7 @@ func (e Tenant) Delete(c *gin.Context) {
 // @Product application/json
 // @Param id path string true "id"
 // @Success 200 {object} response.Response{data=form.TenantGetResp}
-// @Router /admin/api/v1/admin/{id} [get]
+// @Router /admin/api/v1/tenant/{id} [get]
 // @Security Bearer
 func (e Tenant) Get(c *gin.Context) {
 	e.DefaultController.Get(c)
@@ -104,7 +104,7 @@ func (e Tenant) Get(c *gin.Context) {
 // @Param page query string false "当前页"
 // @Param pageSize query string false "每页容量"
 // @Success 200 {object} response.Page{data=[]form.TenantListItem}
-// @Router /admin/api/v1/admin [get]
+// @Router /admin/api/v1/tenant [get]
 // @Security Bearer
 func (e Tenant) List(c *gin.Context) {
 	e.DefaultController.List(c)

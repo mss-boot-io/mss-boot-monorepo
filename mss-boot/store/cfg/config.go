@@ -27,10 +27,10 @@ type Config struct {
 
 func (e *Config) Init(handler func(srv *grpc.Server)) {
 	configSource, err := s3.New(
-		"ap-northeast-1",
-		"matrix-config-center",
-		"mss-boot-io/mss-boot-monorepo/store",
-		5*time.Second)
+		s3.WithRegion("ap-northeast-1"),
+		s3.WithBucket("matrix-config-center"),
+		s3.WithDir("mss-boot-io/mss-boot-monorepo/store"),
+		s3.WithTimeout(5*time.Second))
 	if err != nil {
 		log.Fatalf("cfg(s3) init failed, %s\n", err.Error())
 	}
