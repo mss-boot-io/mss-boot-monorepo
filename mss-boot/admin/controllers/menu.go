@@ -39,7 +39,7 @@ type Menu struct {
 // @Tags menu
 // @Accept  application/json
 // @Product application/json
-// @Param data body form.menuCreateReq true "data"
+// @Param data body form.MenuCreateReq true "data"
 // @Success 200 {object} response.Response
 // @Router /admin/api/v1/menu [post]
 // @Security Bearer
@@ -54,7 +54,7 @@ func (e Menu) Create(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Param id path string true "id"
-// @Param data body form.menuUpdateReq true "data"
+// @Param data body form.MenuUpdateReq true "data"
 // @Success 200 {object} response.Response
 // @Router /admin/api/v1/menu/{id} [put]
 // @Security Bearer
@@ -83,7 +83,7 @@ func (e Menu) Delete(c *gin.Context) {
 // @Accept  application/json
 // @Product application/json
 // @Param id path string true "id"
-// @Success 200 {object} response.Response{data=form.menuGetResp}
+// @Success 200 {object} response.Response{data=form.MenuGetResp}
 // @Router /admin/api/v1/menu/{id} [get]
 // @Security Bearer
 func (e Menu) Get(c *gin.Context) {
@@ -99,7 +99,7 @@ func (e Menu) Get(c *gin.Context) {
 // @Param name query string false "租户名称"
 // @Param page query string false "当前页"
 // @Param pageSize query string false "每页容量"
-// @Success 200 {object} response.Page{data=[]form.menuListItem}
+// @Success 200 {object} response.Page{data=[]form.MenuListItem}
 // @Router /admin/api/v1/menu [get]
 // @Security Bearer
 func (e Menu) List(c *gin.Context) {
