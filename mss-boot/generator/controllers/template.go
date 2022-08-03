@@ -169,10 +169,17 @@ func (e Template) GetParams(c *gin.Context) {
 		e.Err(http.StatusFailedDependency, err)
 		return
 	}
-
 	resp := &form.TemplateGetParamsResp{
-		Params: keys,
+		Params: make([]form.TemplateParam, 0, len(keys)),
 	}
+
+	for k, v := range keys {
+		resp.Params = append(resp.Params, form.TemplateParam{
+			Name: k,
+			Tip:  v,
+		})
+	}
+
 	e.OK(resp)
 }
 
