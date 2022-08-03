@@ -8,10 +8,10 @@
 package controllers
 
 import (
-	"net/http"
-
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/oauth2"
+	"net/http"
 
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/form"
 	"github.com/mss-boot-io/mss-boot/pkg/response"
@@ -113,6 +113,7 @@ func (e Tenant) List(c *gin.Context) {
 func (e Tenant) Other(r *gin.RouterGroup) {
 	r.GET("/client", e.GetClient)
 	r.GET("/callback", e.Callback)
+	r.GET("/callback/dexidp", e.Dex)
 	r.GET("/refresh-token", e.RefreshToken)
 }
 
@@ -150,6 +151,42 @@ func (e Tenant) GetClient(c *gin.Context) {
 	})
 }
 
+func (e Tenant) Dex(c *gin.Context) {
+	req := &form.TenantCallbackReq{}
+	err := e.Make(c).Bind(req).Error
+	if err != nil {
+		e.Err(http.StatusUnprocessableEntity, err)
+		return
+	}
+	client, err := store.DefaultOAuth2Store.
+		GetClientByDomain(c, c.Request.Host)
+	if err != nil {
+		e.Err(http.StatusNotFound, err)
+		return
+	}
+	oauth2Config, err := client.GetOAuth2Config(c)
+	if err != nil {
+		e.Log.Error(err)
+		e.Err(http.StatusUnauthorized, err)
+		return
+	}
+
+	oauth2Token, err := oauth2Config.Exchange(c, req.Code)
+	if err != nil {
+		e.Err(http.StatusUnauthorized, err)
+		return
+	}
+	//todo 从tenant表中获取前端跳转地址
+	u := fmt.Sprintf(
+		"http://localhost:8000/callback?accessToken=%s&refreshToken=%s&expiry=%d&tokenType=%s",
+		oauth2Token.AccessToken,
+		oauth2Token.RefreshToken,
+		oauth2Token.Expiry.Unix(),
+		oauth2Token.TokenType,
+	)
+	c.Redirect(http.StatusFound, u)
+}
+
 // Callback 获取access_token
 // @Summary 获取access_token
 // @Description 获取access_token
@@ -162,7 +199,6 @@ func (e Tenant) GetClient(c *gin.Context) {
 // @Param error_description query string false "error_description"
 // @Success 200 {object} response.Response{data=form.TenantCallbackResp}
 // @Router /admin/api/v1/callback [get]
-// @Security Bearer
 func (e Tenant) Callback(c *gin.Context) {
 	req := &form.TenantCallbackReq{}
 	err := e.Make(c).Bind(req).Error

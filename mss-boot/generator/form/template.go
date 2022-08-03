@@ -1,5 +1,22 @@
 package form
 
+type TemplateGetBranchesReq struct {
+	Source string `query:"source" form:"source" binding:"required"`
+}
+
+type TemplateGetBranchesResp struct {
+	Branches []string `json:"branches"`
+}
+
+type TemplateGetPathReq struct {
+	Source string `query:"source" form:"source" binding:"required"`
+	Branch string `query:"branch" form:"branch"`
+}
+
+type TemplateGetPathResp struct {
+	Path []string `json:"path"`
+}
+
 type TemplateGetParamsReq struct {
 	Source string `query:"source" form:"source" binding:"required"`
 	Branch string `query:"branch" form:"branch"`

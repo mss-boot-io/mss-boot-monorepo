@@ -9,7 +9,6 @@ package models
 
 import (
 	"context"
-	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -18,6 +17,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"

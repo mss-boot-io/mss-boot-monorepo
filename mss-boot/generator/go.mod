@@ -8,7 +8,7 @@ require (
 	github.com/google/go-github/v41 v41.0.0
 	github.com/google/uuid v1.3.0
 	github.com/mss-boot-io/mss-boot/core v0.0.1
-	github.com/mss-boot-io/mss-boot/pkg v0.0.2-0.20220720032547-a60f3a4baaa3
+	github.com/mss-boot-io/mss-boot/pkg v0.0.2-0.20220802022129-fc3ddc25faf1
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.7.9
 	github.com/zealic/xignore v0.3.3

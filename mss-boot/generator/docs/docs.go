@@ -64,6 +64,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/generator/api/v1/template/get-branches": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取template分支",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "获取template分支",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template source",
+                        "name": "source",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/form.TemplateGetBranchesResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/generator/api/v1/template/get-params": {
             "get": {
                 "security": [
@@ -121,6 +167,58 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/generator/api/v1/template/get-path": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取template文件路径list",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "获取template文件路径list",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "template source",
+                        "name": "source",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "branch default:HEAD",
+                        "name": "branch",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/form.TemplateGetPathResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -137,6 +235,9 @@ const docTemplate = `{
                     }
                 },
                 "repo": {
+                    "type": "string"
+                },
+                "service": {
                     "type": "string"
                 }
             }
@@ -163,12 +264,34 @@ const docTemplate = `{
                 }
             }
         },
+        "form.TemplateGetBranchesResp": {
+            "type": "object",
+            "properties": {
+                "branches": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
         "form.TemplateGetParamsResp": {
             "type": "object",
             "properties": {
                 "params": {
                     "type": "object",
                     "additionalProperties": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "form.TemplateGetPathResp": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "type": "array",
+                    "items": {
                         "type": "string"
                     }
                 }
