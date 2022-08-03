@@ -36,9 +36,9 @@ definitions:
   form.TemplateGetParamsResp:
     properties:
       params:
-        additionalProperties:
-          type: string
-        type: object
+        items:
+          $ref: '#/definitions/form.TemplateParam'
+        type: array
     type: object
   form.TemplateGetPathResp:
     properties:
@@ -46,6 +46,13 @@ definitions:
         items:
           type: string
         type: array
+    type: object
+  form.TemplateParam:
+    properties:
+      name:
+        type: string
+      tip:
+        type: string
     type: object
   form.TemplateParams:
     properties:

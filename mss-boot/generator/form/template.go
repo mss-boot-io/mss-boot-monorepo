@@ -24,7 +24,12 @@ type TemplateGetParamsReq struct {
 }
 
 type TemplateGetParamsResp struct {
-	Params map[string]string `json:"params"`
+	Params []TemplateParam `json:"params"`
+}
+
+type TemplateParam struct {
+	Name string `json:"name"`
+	Tip  string `json:"tip"`
 }
 
 type TemplateGenerateReq struct {

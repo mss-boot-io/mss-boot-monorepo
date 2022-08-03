@@ -279,9 +279,9 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "params": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/form.TemplateParam"
                     }
                 }
             }
@@ -294,6 +294,17 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "form.TemplateParam": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "tip": {
+                    "type": "string"
                 }
             }
         },
