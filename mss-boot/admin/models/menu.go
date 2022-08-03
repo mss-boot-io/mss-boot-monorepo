@@ -9,6 +9,8 @@ package models
 
 import (
 	"context"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,32 +28,21 @@ func init() {
 
 // Menu <no value>
 type Menu struct {
-	Id string `bson:"id" json:"id"`
-
-	TenantID string `bson:"tenantID" json:"tenantID"`
-
-	Name string `bson:"name" json:"name"`
-
-	Icon string `bson:"icon" json:"icon"`
-
-	Path string `bson:"path" json:"path"`
-
-	Access string `bson:"access" json:"access"`
-
-	Status enum.Status `bson:"status" json:"status"`
-
-	Routes []Menu `bson:"routes" json:"routes"`
-
-	ParentKeys []string `bson:"parentKeys" json:"parentKeys"`
-
-	Redirect string `bson:"redirect" json:"redirect"`
-
-	Layout bool `bson:"layout" json:"layout"`
-
-	Component string `bson:"component" json:"component"`
-
-	CreatedAt time.Time `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt" bson:"updatedAt"`
+	ID         string      `bson:"id" json:"id"`
+	TenantID   string      `bson:"tenantID" json:"tenantID"`
+	Name       string      `bson:"name" json:"name"`
+	Icon       string      `bson:"icon" json:"icon"`
+	Path       string      `bson:"path" json:"path"`
+	Access     string      `bson:"access" json:"access"`
+	HideInMenu bool        `bson:"hideInMenu" json:"hideInMenu"`
+	Status     enum.Status `bson:"status" json:"status"`
+	Routes     []Menu      `bson:"routes" json:"routes"`
+	ParentKeys []string    `bson:"parentKeys" json:"parentKeys"`
+	Redirect   string      `bson:"redirect" json:"redirect"`
+	Layout     bool        `bson:"layout" json:"layout"`
+	Component  string      `bson:"component" json:"component"`
+	CreatedAt  time.Time   `json:"createdAt" bson:"createdAt"`
+	UpdatedAt  time.Time   `json:"updatedAt" bson:"updatedAt"`
 }
 
 func (Menu) TableName() string {
@@ -71,6 +62,99 @@ func (e *Menu) Make() {
 	})
 	if err != nil {
 		log.Fatal(err)
+	}
+	//初始化数据
+	count, err := e.C().CountDocuments(context.TODO(), bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if count == 0 {
+		now := time.Now()
+		e.C().InsertMany(context.TODO(), []interface{}{
+			&Menu{
+				ID:     primitive.NewObjectID().String(),
+				Path:   "/user",
+				Layout: false,
+				Routes: []Menu{
+					{
+						Path: "/user",
+						Routes: []Menu{
+							{
+								Name:      "login",
+								Path:      "/user/login",
+								Component: "./user/Login",
+							},
+						},
+					},
+					{
+						Component: "./404",
+					},
+				},
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+			&Menu{
+				ID:        primitive.NewObjectID().String(),
+				Name:      "welcome",
+				Path:      "/welcome",
+				Status:    enum.Enabled,
+				Layout:    true,
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+			&Menu{
+				ID:        primitive.NewObjectID().String(),
+				Name:      "menu",
+				Path:      "/menu/list",
+				Status:    enum.Enabled,
+				Layout:    true,
+				CreatedAt: now,
+				UpdatedAt: now,
+				Routes: []Menu{
+					{
+						Name:       "",
+						Path:       "/menu/list",
+						HideInMenu: true,
+					},
+					{
+						Name:       "",
+						Path:       "/menu/control/new",
+						HideInMenu: true,
+					},
+					{
+						Name:       "",
+						Path:       "/menu/:id",
+						HideInMenu: true,
+					},
+					{
+						Name:       "",
+						Path:       "/menu/control/:id",
+						HideInMenu: true,
+					},
+				},
+			},
+			&Menu{
+				ID:        primitive.NewObjectID().String(),
+				Path:      "/",
+				Redirect:  "/welcome",
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+			&Menu{
+				ID:        primitive.NewObjectID().String(),
+				Component: "./404",
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+			&Menu{
+				ID:        primitive.NewObjectID().String(),
+				Name:      "generate",
+				Path:      "/generate",
+				Layout:    true,
+				CreatedAt: now,
+				UpdatedAt: now,
+			},
+		})
 	}
 }
 

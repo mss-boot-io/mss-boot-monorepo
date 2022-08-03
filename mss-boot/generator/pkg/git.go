@@ -150,6 +150,20 @@ func CreateGithubRepo(organization, name, description, token string, private boo
 	return repo, nil
 }
 
+// GetGithubRepoAllBranches get all branches of github repo
+func GetGithubRepoAllBranches(ctx context.Context, organization, name, token string) ([]*github.Branch, error) {
+	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
+	tc := oauth2.NewClient(ctx, ts)
+	client := github.NewClient(tc)
+
+	branches, _, err := client.Repositories.ListBranches(ctx, organization, name, &github.BranchListOptions{
+		ListOptions: github.ListOptions{
+			PerPage: 100,
+		},
+	})
+	return branches, err
+}
+
 // AddActionSecretsGithubRepo add action secret
 //func AddActionSecretsGithubRepo(organization, name, token string, data map[string]string) error {
 //	ctx := context.Background()

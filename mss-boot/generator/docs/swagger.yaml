@@ -7,6 +7,8 @@ definitions:
         type: object
       repo:
         type: string
+      service:
+        type: string
     required:
     - repo
     type: object
@@ -24,12 +26,26 @@ definitions:
       repo:
         type: string
     type: object
+  form.TemplateGetBranchesResp:
+    properties:
+      branches:
+        items:
+          type: string
+        type: array
+    type: object
   form.TemplateGetParamsResp:
     properties:
       params:
         additionalProperties:
           type: string
         type: object
+    type: object
+  form.TemplateGetPathResp:
+    properties:
+      path:
+        items:
+          type: string
+        type: array
     type: object
   form.TemplateParams:
     properties:
@@ -90,6 +106,32 @@ paths:
       summary: 从模版生成代码
       tags:
       - admin
+  /generator/api/v1/template/get-branches:
+    get:
+      consumes:
+      - application/json
+      description: 获取template分支
+      parameters:
+      - description: template source
+        in: query
+        name: source
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.TemplateGetBranchesResp'
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取template分支
+      tags:
+      - admin
   /generator/api/v1/template/get-params:
     get:
       consumes:
@@ -122,6 +164,36 @@ paths:
       security:
       - Bearer: []
       summary: 获取template参数配置
+      tags:
+      - admin
+  /generator/api/v1/template/get-path:
+    get:
+      consumes:
+      - application/json
+      description: 获取template文件路径list
+      parameters:
+      - description: template source
+        in: query
+        name: source
+        required: true
+        type: string
+      - description: branch default:HEAD
+        in: query
+        name: branch
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.TemplateGetPathResp'
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取template文件路径list
       tags:
       - admin
 securityDefinitions:

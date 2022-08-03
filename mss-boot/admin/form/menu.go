@@ -201,6 +201,8 @@ type MenuListItem struct {
 	//状态
 	Status enum.Status `bson:"status" json:"status"`
 
+	Routes []MenuListItem `bson:"routes" json:"routes"`
+
 	//<no value>
 	ParentKeys []string `bson:"parentKeys" json:"parentKeys"`
 
