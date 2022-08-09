@@ -29,3 +29,8 @@ oauth2:
     - openid
     - groups
     - offline_access
+    - name
+clients:
+  store:
+    addr: localhost:9090
+    timeout: 10s

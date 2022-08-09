@@ -28,6 +28,8 @@ import (
 func init() {
 	store.DefaultOAuth2Store = &Tenant{}
 	mongodb.AppendTable(&Tenant{})
+
+	//todo 初始化所有租户到store
 }
 
 // Tenant 租户
@@ -50,7 +52,7 @@ type OnlyClient struct {
 }
 
 func (Tenant) TableName() string {
-	return "admin"
+	return "tenant"
 }
 
 func (e *Tenant) Make() {

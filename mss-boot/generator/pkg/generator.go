@@ -43,6 +43,9 @@ func Generate(c *TemplateConfig) (err error) {
 	} else {
 		templatePath = filepath.Base(c.TemplateUrl)
 	}
+	if c.TemplateLocalSubPath != "" {
+		templatePath = filepath.Join(templatePath, c.TemplateLocalSubPath)
+	}
 	subPath := filepath.Join(templatePath, c.Service)
 
 	if !c.CreateRepo {

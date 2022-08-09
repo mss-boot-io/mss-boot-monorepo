@@ -1,6 +1,6 @@
 FROM alpine:latest
 WORKDIR /app
-ADD store application
+ADD application application
 COPY bin/docker-start.sh .
 
 CMD ["sh", "./docker-start.sh"]

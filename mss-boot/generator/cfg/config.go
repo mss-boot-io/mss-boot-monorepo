@@ -8,6 +8,7 @@
 package cfg
 
 import (
+	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"net/http"
 	"time"
 
@@ -21,11 +22,12 @@ import (
 var Cfg Config
 
 type Config struct {
-	Logger  config.Logger  `yaml:"logger" json:"logger"`
-	Server  config.Listen  `yaml:"server" json:"server"`
-	Health  *config.Listen `yaml:"health" json:"health"`
-	Metrics *config.Listen `yaml:"metrics" json:"metrics"`
-	Github  Github         `yaml:"github" json:"github"`
+	Logger   config.Logger    `yaml:"logger" json:"logger"`
+	Server   config.Listen    `yaml:"server" json:"server"`
+	Health   *config.Listen   `yaml:"health" json:"health"`
+	Metrics  *config.Listen   `yaml:"metrics" json:"metrics"`
+	Database mongodb.Database `yaml:"database" json:"database"`
+	Github   Github           `yaml:"github" json:"github"`
 }
 
 func (e *Config) Init(handler http.Handler) {
