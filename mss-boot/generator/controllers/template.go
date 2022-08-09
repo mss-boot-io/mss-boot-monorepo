@@ -36,6 +36,7 @@ func (Template) Path() string {
 }
 
 func (e Template) Other(r *gin.RouterGroup) {
+	//r.Use((&middlewares.AuthMiddleware{}).AuthMiddleware())
 	r.GET("/template/get-branches", e.GetBranches)
 	r.GET("/template/get-path", e.GetPath)
 	r.GET("/template/get-params", e.GetParams)
@@ -239,17 +240,18 @@ func (e Template) Generate(c *gin.Context) {
 		destination = filepath.Join(destination, req.Generate.Service)
 	}
 	err = pkg.Generate(&pkg.TemplateConfig{
-		Service:       req.Template.Path,
-		TemplateLocal: dir,
-		Destination:   destination,
-		Params:        req.Generate.Params,
+		Service:              req.Template.Path,
+		TemplateLocal:        dir,
+		TemplateLocalSubPath: req.Template.Branch,
+		Destination:          destination,
+		Params:               req.Generate.Params,
 	})
 	if err != nil {
 		e.Log.Error(err)
 		e.Err(http.StatusInternalServerError, err)
 		return
 	}
-	err = pkg.CommitAndPushGithubRepo(codeDir, branch, cfg.Cfg.Github.PersonalAccessToken)
+	err = pkg.CommitAndPushGithubRepo(codeDir, branch, req.Generate.Service, cfg.Cfg.Github.PersonalAccessToken)
 	if err != nil {
 		e.Log.Error(err)
 		e.Err(http.StatusInternalServerError, err)

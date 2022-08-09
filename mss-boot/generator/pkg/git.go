@@ -64,13 +64,16 @@ func GitClone(url, branch, directory string, noCheckout bool, accessToken string
 		auth.Username = "lwnmengjing"
 		auth.Password = accessToken
 	}
+	directory += "/" + branch
 	if PathExist(directory) {
 		r, err := git.PlainOpen(directory)
 		if err != nil {
+			log.Println(err)
 			return nil, err
 		}
 		w, err := r.Worktree()
 		if err != nil {
+			log.Println(err)
 			return nil, err
 		}
 		if branch != "" {
@@ -91,6 +94,7 @@ func GitClone(url, branch, directory string, noCheckout bool, accessToken string
 		if errors.Is(err, git.NoErrAlreadyUpToDate) {
 			return r, nil
 		}
+		log.Println(err)
 		return r, err
 	}
 	if branch != "" {
@@ -185,7 +189,7 @@ func GetGithubRepoAllBranches(ctx context.Context, organization, name, token str
 //}
 
 // CommitAndPushGithubRepo commit and push github repo
-func CommitAndPushGithubRepo(directory, branch, accessToken string) error {
+func CommitAndPushGithubRepo(directory, branch, path, accessToken string) error {
 	r, err := git.PlainOpen(directory)
 	if err != nil {
 		log.Println(err)
@@ -205,12 +209,16 @@ func CommitAndPushGithubRepo(directory, branch, accessToken string) error {
 		log.Println(err)
 		return err
 	}
-	_, err = w.Add(".")
+	if path == "" {
+		path = "."
+	}
+	fmt.Println("path:", path)
+	_, err = w.Add(path)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	_, err = w.Commit(":tada: generate new service", &git.CommitOptions{All: true})
+	_, err = w.Commit(":tada: generate "+path, &git.CommitOptions{All: true})
 	if err != nil {
 		log.Println(err)
 		return err

@@ -49,6 +49,13 @@ func (e *Config) Init(handler http.Handler) {
 	e.Logger.Init()
 	e.Database.Init()
 
+	if len(e.Clients) > 0 {
+		err = e.Clients.Init()
+		if err != nil {
+			log.Fatalf("cfg(clients) init failed, %s\n", err.Error())
+		}
+	}
+
 	runnable := []server.Runnable{
 		listener.New("admin",
 			e.Server.Init(listener.WithHandler(handler))...),

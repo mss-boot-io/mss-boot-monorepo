@@ -1,6 +1,6 @@
 FROM alpine:latest
 WORKDIR /app
-ADD admin application
+ADD application application
 COPY bin/docker-start.sh .
 
 ENV GIN_MODE release
