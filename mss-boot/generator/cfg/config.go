@@ -8,7 +8,10 @@
 package cfg
 
 import (
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
+	"github.com/mss-boot-io/mss-boot/client"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
+	"github.com/mss-boot-io/mss-boot/pkg/store"
 	"net/http"
 	"time"
 
@@ -28,6 +31,7 @@ type Config struct {
 	Metrics  *config.Listen   `yaml:"metrics" json:"metrics"`
 	Database mongodb.Database `yaml:"database" json:"database"`
 	Github   Github           `yaml:"github" json:"github"`
+	Clients  config.Clients   `yaml:"clients" json:"clients"`
 }
 
 func (e *Config) Init(handler http.Handler) {
@@ -47,8 +51,17 @@ func (e *Config) Init(handler http.Handler) {
 
 	e.Logger.Init()
 
+	if len(e.Clients) > 0 {
+		err = e.Clients.Init()
+		if err != nil {
+			log.Fatalf("cfg(clients) init failed, %s\n", err.Error())
+		}
+	}
+
+	store.DefaultOAuth2Store = models.NewTenant(client.Store().GetClient())
+
 	runnable := []server.Runnable{
-		listener.New("admin",
+		listener.New("generator",
 			e.Server.Init(listener.WithHandler(handler))...),
 	}
 	if e.Health != nil {

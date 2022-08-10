@@ -48,6 +48,17 @@ func TestMemory_Get(t *testing.T) {
 			"",
 			true,
 		},
+		{
+			"test03",
+			fields{},
+			args{
+				key:    "test03",
+				value:  "test1",
+				expire: -1,
+			},
+			"test1",
+			false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

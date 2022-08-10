@@ -9,6 +9,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/mss-boot-io/mss-boot/pkg/middlewares"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -36,7 +37,7 @@ func (Template) Path() string {
 }
 
 func (e Template) Other(r *gin.RouterGroup) {
-	//r.Use((&middlewares.AuthMiddleware{}).AuthMiddleware())
+	r.Use((&middlewares.AuthMiddleware{}).AuthMiddleware())
 	r.GET("/template/get-branches", e.GetBranches)
 	r.GET("/template/get-path", e.GetPath)
 	r.GET("/template/get-params", e.GetParams)

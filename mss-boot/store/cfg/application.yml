@@ -15,3 +15,9 @@ logger:
   level: trace
   # 日志格式 json json格式
   formatter: default
+cache: memory
+queue: memory
+locker: memory
+provider:
+  memory:
+    poolSize: 100

@@ -72,7 +72,7 @@ func (e *Menu) Make() {
 		now := time.Now()
 		e.C().InsertMany(context.TODO(), []interface{}{
 			&Menu{
-				ID:     primitive.NewObjectID().String(),
+				ID:     primitive.NewObjectID().Hex(),
 				Path:   "/user",
 				Layout: false,
 				Routes: []Menu{
@@ -94,7 +94,7 @@ func (e *Menu) Make() {
 				UpdatedAt: now,
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().String(),
+				ID:        primitive.NewObjectID().Hex(),
 				Name:      "welcome",
 				Path:      "/welcome",
 				Status:    enum.Enabled,
@@ -103,7 +103,7 @@ func (e *Menu) Make() {
 				UpdatedAt: now,
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().String(),
+				ID:        primitive.NewObjectID().Hex(),
 				Name:      "menu",
 				Path:      "/menu/list",
 				Status:    enum.Enabled,
@@ -134,20 +134,20 @@ func (e *Menu) Make() {
 				},
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().String(),
+				ID:        primitive.NewObjectID().Hex(),
 				Path:      "/",
 				Redirect:  "/welcome",
 				CreatedAt: now,
 				UpdatedAt: now,
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().String(),
+				ID:        primitive.NewObjectID().Hex(),
 				Component: "./404",
 				CreatedAt: now,
 				UpdatedAt: now,
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().String(),
+				ID:        primitive.NewObjectID().Hex(),
 				Name:      "generate",
 				Path:      "/generate",
 				Layout:    true,

@@ -29,7 +29,8 @@ oauth2:
     - openid
     - groups
     - offline_access
-    - name
+    - email
+    - profile
 clients:
   store:
     addr: localhost:9090
