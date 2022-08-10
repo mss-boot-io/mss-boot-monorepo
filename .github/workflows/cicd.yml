@@ -1,0 +1,105 @@
+name: Deploy Service
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [admin, generator, store]
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+        with:
+          driver: docker
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: image
+        id: image
+        run: echo "::set-output name=image::${repo}/${{ matrix.service }}"
+        env:
+          repo: ${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v4
+        with:
+          images: ${{steps.image.outputs.image}}
+          flavor: |
+            latest=auto
+          tags: |
+            type=schedule
+            type=ref,event=tag
+            type=sha,prefix=,format=long,enable=true,priority=100
+
+      - name: Build
+        run: |
+          cp -r bin mss-boot/${{ matrix.service }}
+          cd mss-boot/${{ matrix.service }} 
+          make build
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: mss-boot/${{ matrix.service }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  cd:
+    name: cd
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [admin, generator, store]
+    steps:
+      - uses: actions/checkout@v3
+        
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '14'
+      
+      - name: image
+        id: image
+        run: echo "::set-output name=image::${image}/${{ matrix.service }}"
+        env:
+          image: ${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Generate K8S Config
+        run: |
+          curl -O https://lwnmengjing.github.io/cd-template/latest/linux_amd64.tar.gz
+          tar -zxvf linux_amd64.tar.gz
+          ./cd-template --service=${{ matrix.service }} --image=${{ steps.image.outputs.image }}:${{ github.sha }} --replicas=1 --config=.github/deploy-config.yml
+          mkdir -p artifact/cdk8s 
+          mv dist/test artifact/cdk8s/${{ matrix.service }}
+      
+      - name: Generate ArgoCD Config
+        env: 
+          project: mss-boot
+          stage: alpha
+          service: ${{ matrix.service }}
+          cluster: matrix-devops
+          branch: main
+          repository: https://github.com/mss-boot-io/mss-boot-gitops
+        run: |
+          mkdir -p artifact/argocd
+          envsubst < .github/application.yml > artifact/argocd/${{ matrix.service }}-${{steps.stage.outputs.tag}}.yml
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: artifact

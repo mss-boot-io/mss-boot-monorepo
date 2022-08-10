@@ -1,0 +1,15 @@
+app: mss-boot
+# service name
+service: mss-boot
+# exposed port
+ports:
+  - port: 8080
+    targetPort: 8080
+    name: http
+# enable metrics endpoint: default path is /metrics & default port is 5000
+metrics:
+  scrape: false
+  path: /metrics/prometheus
+# enable hpa
+hpa: true
+serviceAccountName: aws-access
