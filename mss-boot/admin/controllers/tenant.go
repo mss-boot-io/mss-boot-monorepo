@@ -147,7 +147,7 @@ func (e Tenant) GetClient(c *gin.Context) {
 	e.OK(form.TenantClientResp{
 		ServerURL:   client.GetIssuer(),
 		ClientID:    oauth2Config.ClientID,
-		AuthCodeURL: oauth2Config.AuthCodeURL("state-replace", oauth2.AccessTypeOffline),
+		AuthCodeURL: oauth2Config.AuthCodeURL("state-replace", oauth2.AccessTypeOnline),
 	})
 }
 

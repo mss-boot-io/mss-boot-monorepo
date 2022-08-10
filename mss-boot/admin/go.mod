@@ -5,8 +5,10 @@ go 1.18
 require (
 	github.com/casdoor/casdoor-go-sdk v0.4.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/mss-boot-io/mss-boot/client v0.0.1
 	github.com/mss-boot-io/mss-boot/core v0.0.1
 	github.com/mss-boot-io/mss-boot/pkg v0.0.2-0.20220802022129-fc3ddc25faf1
+	github.com/mss-boot-io/mss-boot/proto v0.0.1
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.7.9
 	go.mongodb.org/mongo-driver v1.9.0
@@ -61,8 +63,6 @@ require (
 	github.com/matttproud/golang_protobuf_extensions v1.0.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/mss-boot-io/mss-boot/client v0.0.1 // indirect
-	github.com/mss-boot-io/mss-boot/proto v0.0.1 // indirect
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/prometheus/client_golang v1.12.1 // indirect

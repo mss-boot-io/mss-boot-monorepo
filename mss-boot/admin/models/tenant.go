@@ -9,6 +9,10 @@ package models
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/mss-boot-io/mss-boot/client"
+	pb "github.com/mss-boot-io/mss-boot/proto/store/v1"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -28,27 +32,30 @@ import (
 func init() {
 	store.DefaultOAuth2Store = &Tenant{}
 	mongodb.AppendTable(&Tenant{})
-
-	//todo 初始化所有租户到store
 }
 
 // Tenant 租户
 type Tenant struct {
-	ID          string        `json:"id" bson:"_id"`
-	Name        string        `json:"name" bson:"name"`
-	Contact     string        `json:"contact" bson:"contact"`
-	System      bool          `json:"system" bson:"system"`
-	Status      enum.Status   `json:"status" bson:"status"`
-	Description string        `json:"description" bson:"description"`
-	Domains     []string      `json:"domains" bson:"domains"`
-	Client      config.OAuth2 `json:"client" bson:"client"`
-	Metadata    interface{}   `json:"metadata" bson:"metadata"`
-	ExpiredAt   time.Time     `json:"expiredAt" bson:"expiredAt" binding:"required"`
-	CreatedAt   time.Time     `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time     `json:"updatedAt" bson:"updatedAt"`
+	ID          string         `json:"id" bson:"_id"`
+	Name        string         `json:"name" bson:"name"`
+	Contact     string         `json:"contact" bson:"contact"`
+	System      bool           `json:"system" bson:"system"`
+	Status      enum.Status    `json:"status" bson:"status"`
+	Description string         `json:"description" bson:"description"`
+	Domains     []string       `json:"domains" bson:"domains"`
+	Client      config.OAuth2  `json:"client" bson:"client"`
+	Metadata    interface{}    `json:"metadata" bson:"metadata"`
+	ExpiredAt   time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
+	CreatedAt   time.Time      `json:"createdAt" bson:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt" bson:"updatedAt"`
+	storeClient pb.StoreClient `bson:"-"`
 }
 type OnlyClient struct {
 	Client config.OAuth2 `json:"client" bson:"client"`
+}
+
+func NewTenant(storeclient pb.StoreClient) *Tenant {
+	return &Tenant{storeClient: storeclient}
 }
 
 func (Tenant) TableName() string {
@@ -74,13 +81,13 @@ func (e *Tenant) Make() {
 	if count == 0 {
 		now := time.Now()
 		e.C().InsertOne(context.TODO(), Tenant{
-			ID:          primitive.NewObjectID().String(),
+			ID:          primitive.NewObjectID().Hex(),
 			Name:        "mss-boot-io",
 			Contact:     "mss-boot-io",
 			System:      true,
 			Status:      enum.Enabled,
 			Description: "mss-boot-io",
-			Domains:     []string{"localhost:8080"},
+			Domains:     []string{"localhost:8080", "localhost:8081"},
 			Client: config.OAuth2{
 				Issuer:       cfg.Cfg.OAuth2.Issuer,
 				ClientID:     cfg.Cfg.OAuth2.ClientID,
@@ -92,6 +99,7 @@ func (e *Tenant) Make() {
 			CreatedAt: now,
 			UpdatedAt: now,
 		})
+		return
 	}
 }
 
@@ -101,10 +109,50 @@ func (e *Tenant) C() *mongo.Collection {
 
 // GetClientByDomain 获取租户的client
 func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAuth2Configure, error) {
+	fmt.Println(domain)
+	if e.storeClient == nil {
+		e.storeClient = client.Store().GetClient()
+	}
+	resp, err := e.storeClient.Get(c, &pb.GetReq{Key: fmt.Sprintf("tenant_%s", domain)})
+	if err != nil {
+		return nil, err
+	}
 	data := &OnlyClient{}
-	err := e.C().FindOne(c, bson.M{"domains": domain}).Decode(data)
+	fmt.Println(resp.Value)
+	err = json.Unmarshal([]byte(resp.Value), data)
 	if err != nil {
 		return nil, err
 	}
 	return &data.Client, nil
+}
+
+func (e *Tenant) InitStore() {
+	//todo 初始化所有租户到store
+	c := client.Store().GetClient()
+
+	cur, err := e.C().Find(context.TODO(), bson.M{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	for cur.Next(context.TODO()) {
+		var tenant Tenant
+		err := cur.Decode(&tenant)
+		if err != nil {
+			log.Fatal(err)
+		}
+		rb, err := json.Marshal(tenant)
+		if err != nil {
+			log.Fatal(err)
+		}
+		for _, domain := range tenant.Domains {
+			_, err = c.Set(context.TODO(), &pb.SetReq{
+				Key:   fmt.Sprintf("tenant_%s", domain),
+				Value: string(rb),
+			})
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+
+	}
 }

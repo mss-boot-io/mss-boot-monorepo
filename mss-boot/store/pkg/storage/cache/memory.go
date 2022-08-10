@@ -73,6 +73,10 @@ func (m *Memory) Set(_ context.Context, key string, val interface{}, expire int)
 		Value:   s,
 		Expired: time.Now().Add(time.Duration(expire) * time.Second),
 	}
+	if expire <= 0 {
+		//永不过期, 100年
+		item.Expired = time.Now().Add(time.Duration(864000) * time.Hour)
+	}
 	return m.setItem(key, item)
 }
 

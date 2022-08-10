@@ -2,11 +2,13 @@ package main
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
-	"github.com/mss-boot-io/mss-boot/core/server"
 	"log"
 
+	"github.com/gin-gonic/gin"
+	"github.com/mss-boot-io/mss-boot/core/server"
+
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/router"
 )
 
@@ -25,6 +27,8 @@ func main() {
 	router.Init(r.Group("/admin"))
 
 	cfg.Cfg.Init(r)
+
+	models.Init()
 
 	log.Println("starting admin manage")
 
