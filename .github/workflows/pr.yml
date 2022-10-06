@@ -1,0 +1,85 @@
+name: PR Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  triage:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/labeler@v3
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+  leaf:
+    runs-on: self-hosted
+    needs: triage
+    outputs:
+      leaf: ${{ steps.changed.outputs.leaf }}
+      need_ci: ${{ steps.changed.outputs.need_ci }}
+      changed: ${{ steps.changed.outputs.changed }}
+      lib: ${{ steps.changed.outputs.lib }}
+      test_report: ${{ steps.get_report_url.outputs.all }}
+    env:
+      repo: ${{ github.repository }}
+      mark: ${{ github.event.pull_request.number }}
+      bucket: matrixlabs-github-runner-artifact
+      region: ${{ secrets.aws_region }}
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: get workflow-tools
+        run: |
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
+          chmod +x ./workflow-tools
+
+      - id: changed_files
+        name: git-changesets
+        run: ./workflow-tools change
+        env:
+          accessToken: ${{ github.token }}
+
+      - id: changed
+        name: Download Workflow Tools
+        run: |
+          ./workflow-tools dep
+        env:
+          workspace: ${{ github.workspace }}
+          ignore_paths: bin,.github,matrix-gradle-task,matrix-gradle-plugin
+          github_repository: ${{ github.repository }}
+          cloudfront_url: https://d3p3arc4rj73mc.cloudfront.net
+          pr_num: ${{ github.event.pull_request.number }}
+
+      - id: get_report_url
+        name: Get Test Report URl
+        run: echo "::set-output name=all::"$(aws s3 cp s3://matrixlabs-github-runner-artifact/${{ github.repository }}/${{ github.sha }}/artifact/workflow/service.json - | jq -r '.[]')
+
+  check:
+    runs-on: self-hosted
+    needs: leaf
+    env:
+      repo: ${{ github.repository }}
+      mark: ${{ github.event.pull_request.number }}
+      bucket: matrixlabs-github-runner-artifact
+      region: ${{ secrets.aws_region }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Build Check
+        run: |
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
+          chmod +x ./workflow-tools
+          ./workflow-tools mk
+        env:
+          coverage_standard: 60
+          repo_path: ${{ github.repository }}
+          pr_number: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          error_block: true
+          leaf: ${{ needs.leaf.outputs.leaf }}
+          cmd: make generate && make test

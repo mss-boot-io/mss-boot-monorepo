@@ -1,0 +1,15 @@
+cicd:
+  - '.github/*'
+  - '.github/**'
+service/admin:
+  - 'mss-boot/admin/*'
+  - 'mss-boot/admin/**'
+service/generator:
+  - 'mss-boot/generator/*'
+  - 'mss-boot/generator/**'
+service/store:
+  - 'mss-boot/store/*'
+  - 'mss-boot/store/**'
+bin:
+  - 'bin/*'
+  - 'bin/**'

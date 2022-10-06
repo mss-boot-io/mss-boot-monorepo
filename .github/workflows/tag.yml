@@ -1,0 +1,41 @@
+name: Tag For Prod
+
+on:
+  push:
+    tags:
+      - '*/v*'
+
+jobs:
+  pre:
+    runs-on: self-hosted
+    if: startsWith(github.ref, 'refs/tags/')
+    outputs:
+      tag: ${{ steps.step1.outputs.test }}
+      leaf: ${{ steps.step2.outputs.test }}
+    steps:
+      - id: step1
+        env:
+          ref: ${{ github.ref }}
+        run: |
+          echo "::set-output name=test::${ref##*/}"
+      - id: step2
+        env:
+          ref: ${{ github.ref }}
+        run: |
+          export a=${ref#*refs/tags/mss-boot/}
+          export service=${a%/*}
+          export leaf="[{\"name\": \"${service}\"}]"
+          echo "::set-output name=test::[{\"name\": \"${service}\", \"type\": \"service\"}]"
+
+  cicd:
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yaml@main
+    needs: pre
+    with:
+      leaf: ${{ needs.pre.outputs.leaf }}
+      image_tags: ${{ needs.pre.outputs.tag }}
+    secrets:
+      aws_region: ${{ secrets.aws_region }}
+      aws_account: ${{ secrets.aws_account }}
+      gitops_deploy_key: ${{ secrets.gitops_deploy_key }}
+      dockerhub_username: ${{ secrets.dockerhub_username }}
+      dockerhub_token: ${{ secrets.dockerhub_token }}
