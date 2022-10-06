@@ -7,7 +7,7 @@ on:
 
 jobs:
   triage:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/labeler@v3
         with:
@@ -73,6 +73,9 @@ jobs:
         with:
           go-version: '1.18'
 
+      - name: install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
       - name: Build Check
         run: |
           aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
@@ -86,3 +89,4 @@ jobs:
           error_block: true
           leaf: ${{ needs.leaf.outputs.leaf }}
           cmd: make generate && make test
+          ci: true

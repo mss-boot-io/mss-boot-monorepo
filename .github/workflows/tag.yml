@@ -7,7 +7,7 @@ on:
 
 jobs:
   pre:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     outputs:
       tag: ${{ steps.step1.outputs.test }}

@@ -19,3 +19,5 @@ cfg/*.yml
 cfg/*.yaml
 
 temp/
+
+generator
