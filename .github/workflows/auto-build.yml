@@ -47,7 +47,10 @@ jobs:
     needs: leaf
     with:
       leaf: ${{ needs.leaf.outputs.leaf }}
+      image_tags: ${{ github.sha }}
     secrets:
       aws_region: ${{ secrets.aws_region }}
       aws_account: ${{ secrets.aws_account }}
       gitops_deploy_key: ${{ secrets.gitops_deploy_key }}
+      dockerhub_username: ${{ secrets.dockerhub_username }}
+      dockerhub_token: ${{ secrets.dockerhub_token }}
