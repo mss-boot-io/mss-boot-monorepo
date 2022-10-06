@@ -18,11 +18,6 @@ const docTemplate = `{
     "paths": {
         "/admin/api/v1/callback": {
             "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
                 "description": "获取access_token",
                 "consumes": [
                     "application/json"
@@ -994,6 +989,12 @@ const docTemplate = `{
                 "redirect": {
                     "description": "重定向",
                     "type": "string"
+                },
+                "routes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/form.MenuListItem"
+                    }
                 },
                 "status": {
                     "description": "状态",

@@ -1,0 +1,74 @@
+on:
+  workflow_call:
+    inputs:
+      leaf:
+        description: 'leaf names'
+        required: true
+        default: '[]'
+        type: string
+      image_tags:
+        description: 'image tag'
+        required: false
+        default: ${{ github.sha }}
+        type: string
+    secrets:
+      aws_account:
+        required: true
+        description: aws account
+      aws_region:
+        required: true
+        description: aws region
+      gitops_deploy_key:
+        required: true
+        description: ''
+      dockerhub_token:
+        required: true
+        description: ''
+      dockerhub_username:
+        required: true
+        description: ''
+
+jobs:
+  build:
+    name: ci
+    runs-on: self-hosted
+    env:
+      repo: ${{ github.repository }}
+      mark: ${{ github.sha }}
+      bucket: matrixlabs-github-runner-artifact
+      region: ${{ secrets.aws_region }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ secrets.aws_region }}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.dockerhub_username }}
+          password: ${{ secrets.dockerhub_token }}
+
+
+      - name: install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Build && Deploy
+        run: |
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
+          chmod +x ./workflow-tools
+          ./workflow-tools mk --docker-push=true
+        env:
+          leaf: ${{ inputs.leaf }}
+          cmd: cp -r ../../bin ./ && make generate && make test && make build
+          docker_organize: mssbootio
+          docker_tags: ${{ inputs.image_tags }}
+

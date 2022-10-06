@@ -1,0 +1,55 @@
+name: Auto Build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  leaf:
+    runs-on: self-hosted
+    if: ${{ github.event_name != 'workflow_dispatch' }}
+    outputs:
+      leaf: ${{ steps.changed.outputs.leaf }}
+      need_ci: ${{ steps.changed.outputs.need_ci }}
+    env:
+      repo: ${{ github.repository }}
+      mark: ${{ github.sha }}
+      bucket: matrixlabs-github-runner-artifact
+      region: ${{ secrets.aws_region }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: get workflow-tools
+        run: |
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
+          chmod +x ./workflow-tools
+
+      - id: changed_files
+        name: git change sets
+        run: ./workflow-tools change
+        env:
+          accessToken: ${{ github.token }}
+
+      - id: changed
+        run: ./workflow-tools dep
+        env:
+          workspace: ${{ github.workspace }}
+          ignore_paths: bin,.github
+          filename: go.mod
+          project_name_match: 'module github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/\s(.+)'
+          dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
+
+  cicd:
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
+    needs: leaf
+    with:
+      leaf: ${{ needs.leaf.outputs.leaf }}
+      image_tags: ${{ github.sha }}
+    secrets:
+      aws_region: ${{ secrets.aws_region }}
+      aws_account: ${{ secrets.aws_account }}
+      gitops_deploy_key: ${{ secrets.gitops_deploy_key }}
+      dockerhub_username: ${{ secrets.dockerhub_username }}
+      dockerhub_token: ${{ secrets.dockerhub_token }}

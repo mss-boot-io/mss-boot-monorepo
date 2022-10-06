@@ -258,6 +258,10 @@ definitions:
       redirect:
         description: 重定向
         type: string
+      routes:
+        items:
+          $ref: '#/definitions/form.MenuListItem'
+        type: array
       status:
         description: 状态
         type: integer
@@ -540,8 +544,6 @@ paths:
                 data:
                   $ref: '#/definitions/form.TenantCallbackResp'
               type: object
-      security:
-      - Bearer: []
       summary: 获取access_token
       tags:
       - admin
