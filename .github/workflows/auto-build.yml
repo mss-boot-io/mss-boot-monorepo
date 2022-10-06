@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/workflow
 
 jobs:
   leaf:
@@ -43,7 +42,7 @@ jobs:
           dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
 
   cicd:
-    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@feat/workflow
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
     needs: leaf
     with:
       leaf: ${{ needs.leaf.outputs.leaf }}
