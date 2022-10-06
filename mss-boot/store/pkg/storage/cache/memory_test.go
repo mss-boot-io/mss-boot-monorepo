@@ -46,7 +46,7 @@ func TestMemory_Get(t *testing.T) {
 				expire: 1,
 			},
 			"",
-			true,
+			false,
 		},
 		{
 			"test03",
