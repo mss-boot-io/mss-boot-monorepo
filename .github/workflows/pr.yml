@@ -86,3 +86,4 @@ jobs:
           error_block: true
           leaf: ${{ needs.leaf.outputs.leaf }}
           cmd: make generate && make test
+          ci: true

@@ -2,6 +2,7 @@ package queue
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 
@@ -12,6 +13,9 @@ import (
 )
 
 func TestRedis_Append(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping testing in CI environment")
+	}
 	type fields struct {
 		ConnectOption   *redis.Options
 		ConsumerOptions *redisqueue.ConsumerOptions
@@ -75,6 +79,9 @@ func TestRedis_Append(t *testing.T) {
 }
 
 func TestRedis_Register(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Skipping testing in CI environment")
+	}
 	type fields struct {
 		ConnectOption   *redis.Options
 		ConsumerOptions *redisqueue.ConsumerOptions
@@ -127,7 +134,7 @@ func TestRedis_Register(t *testing.T) {
 				t.Errorf("SetQueue() error = %v", err)
 			} else {
 				r.Register(tt.args.name, tt.args.f)
-				r.Run()
+				go r.Run()
 			}
 		})
 	}

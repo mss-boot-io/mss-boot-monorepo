@@ -71,4 +71,5 @@ jobs:
           cmd: cp -r ../../bin ./ && make generate && make test && make build
           docker_organize: mssbootio
           docker_tags: ${{ inputs.image_tags }}
+          ci: true
 
