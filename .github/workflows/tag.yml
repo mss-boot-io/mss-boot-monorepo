@@ -28,7 +28,7 @@ jobs:
           echo "::set-output name=test::[{\"name\": \"${service}\", \"type\": \"service\"}]"
 
   cicd:
-    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yaml@main
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
     needs: pre
     with:
       leaf: ${{ needs.pre.outputs.leaf }}

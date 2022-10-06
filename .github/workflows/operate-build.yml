@@ -1,0 +1,23 @@
+name: Operate Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "services(json array service name and service type(service or lambda))"
+        default: '[{"name": "admin", "type": "service", "language": "golang"}]'
+        required: true
+
+jobs:
+  cicd:
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
+    if: ${{ github.event.inputs.service != '' && github.event_name == 'workflow_dispatch' }}
+    with:
+      leaf: ${{ github.event.inputs.service }}
+      image_tags: ${{ github.sha }}
+    secrets:
+      aws_region: ${{ secrets.aws_region }}
+      aws_account: ${{ secrets.aws_account }}
+      gitops_deploy_key: ${{ secrets.gitops_deploy_key }}
+      dockerhub_username: ${{ secrets.dockerhub_username }}
+      dockerhub_token: ${{ secrets.dockerhub_token }}
