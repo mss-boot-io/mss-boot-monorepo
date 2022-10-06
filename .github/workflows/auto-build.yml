@@ -24,7 +24,7 @@ jobs:
 
       - name: get workflow-tools
         run: |
-          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.2-staging/bin/workflow-tools . --quiet
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
           chmod +x ./workflow-tools
 
       - id: changed_files
@@ -34,10 +34,13 @@ jobs:
           accessToken: ${{ github.token }}
 
       - id: changed
-        run: ./workflow-tools dep -filename go.mod -project-name-match 'module github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/\s(.+)' -dependence-match 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
+        run: ./workflow-tools dep
         env:
           workspace: ${{ github.workspace }}
           ignore_paths: bin,.github
+          filename: go.mod
+          project_name_match: 'module github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/\s(.+)'
+          dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
 
   cicd:
     uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@feat/workflow

@@ -47,7 +47,7 @@ jobs:
 
       - name: Build && Deploy
         run: |
-          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.2-staging/bin/workflow-tools . --quiet
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
           chmod +x ./workflow-tools
           ./workflow-tools mk
         env:
