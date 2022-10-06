@@ -1,0 +1,55 @@
+on:
+  workflow_call:
+    inputs:
+      leaf:
+        description: 'leaf names'
+        required: true
+        default: '[]'
+        type: string
+      image_tag:
+        description: 'image tag'
+        required: false
+        default: ${{ github.sha }}
+        type: string
+      config_stage:
+        description: 'config stage'
+        required: false
+        default: 'test'
+        type: string
+    secrets:
+      aws_account:
+        required: true
+        description: aws account
+      aws_region:
+        required: true
+        description: aws region
+      gitops_deploy_key:
+        required: true
+        description: ''
+
+jobs:
+  build:
+    name: ci
+    runs-on: self-hosted
+    env:
+      repo: ${{ github.repository }}
+      mark: ${{ github.sha }}
+      bucket: matrixlabs-github-runner-artifact
+      region: ${{ secrets.aws_region }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: '1.18'
+
+      - name: Build && Deploy
+        run: |
+          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.2-staging/bin/workflow-tools . --quiet
+          chmod +x ./workflow-tools
+          ./workflow-tools mk
+        env:
+          leaf: ${{ inputs.leaf }}
+          cmd: make generate && make test && make build
