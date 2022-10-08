@@ -11,6 +11,11 @@ on:
         required: false
         default: ${{ github.sha }}
         type: string
+      config_stage:
+        description: 'config stage'
+        required: false
+        default: 'test'
+        type: string
     secrets:
       aws_account:
         required: true
@@ -30,7 +35,7 @@ on:
 
 jobs:
   build:
-    name: ci
+    name: cicd
     runs-on: self-hosted
     env:
       repo: ${{ github.repository }}
@@ -45,6 +50,11 @@ jobs:
         uses: actions/setup-go@v3
         with:
           go-version: '1.18'
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -65,11 +75,21 @@ jobs:
         run: |
           aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
           chmod +x ./workflow-tools
-          ./workflow-tools mk --docker-push=true
+          ./workflow-tools mk --docker-push=true --generate-cdk8s=true
         env:
           leaf: ${{ inputs.leaf }}
           cmd: cp -r ../../bin ./ && make generate && make test && make build
           docker_organize: mssbootio
           docker_tags: ${{ inputs.image_tags }}
           ci: true
+          config_stage: ${{ inputs.config_stage }}
 
+      - name: Push K8S Yaml
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          deploy_key: ${{ secrets.gitops_deploy_key }}
+          publish_dir: ./dist
+          keep_files: true
+          publish_branch: main
+          destination_dir: mss-boot-monorepo
+          external_repository: mss-boot-io/mss-boot-gitops

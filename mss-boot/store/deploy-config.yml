@@ -1,0 +1,11 @@
+app: mss-boot
+service: store
+ports:
+  - port: 9090
+    targetPort: 9090
+    name: grpc
+metrics:
+  scrape: true
+  port: 5000
+  path: /metrics
+hpa: false
