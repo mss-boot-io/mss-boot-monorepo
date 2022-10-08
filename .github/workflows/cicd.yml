@@ -11,6 +11,11 @@ on:
         required: false
         default: ${{ github.sha }}
         type: string
+      config_stage:
+        description: 'config stage'
+        required: false
+        default: 'test'
+        type: string
     secrets:
       aws_account:
         required: true
@@ -30,7 +35,7 @@ on:
 
 jobs:
   build:
-    name: ci
+    name: cicd
     runs-on: self-hosted
     env:
       repo: ${{ github.repository }}
@@ -65,11 +70,48 @@ jobs:
         run: |
           aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
           chmod +x ./workflow-tools
-          ./workflow-tools mk --docker-push=true
+          ./workflow-tools mk --docker-push=true --generate-cdk8s=true
         env:
           leaf: ${{ inputs.leaf }}
           cmd: cp -r ../../bin ./ && make generate && make test && make build
           docker_organize: mssbootio
           docker_tags: ${{ inputs.image_tags }}
           ci: true
+          config_stage: ${{ inputs.config_stage }}
 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: cdk8s
+          path: dist/
+  gitops:
+    name: gitops
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: cdk8s
+          path: dist/
+
+      - name: (test)Push K8S Yaml
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ inputs.config_stage == 'test' }}
+        with:
+          deploy_key: ${{ secrets.gitops_deploy_key }}
+          publish_dir: ./dist/test
+          keep_files: true
+          publish_branch: ${{ github.repository }}
+          destination_dir: ${{ needs.pre.outputs.repo }}/test
+          external_repository: mss-boot-io/mss-boot-gitops
+
+      - name: (prod)Push K8S Yaml
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ inputs.config_stage == 'prod' }}
+        with:
+          deploy_key: ${{ secrets.gitops_deploy_key }}
+          publish_dir: ./dist/prod
+          keep_files: true
+          publish_branch: ${{ github.repository }}
+          destination_dir: ${{ needs.pre.outputs.repo }}/prod
+          external_repository: mss-boot-io/mss-boot-gitops

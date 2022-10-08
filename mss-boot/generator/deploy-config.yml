@@ -1,0 +1,11 @@
+app: mss-boot
+service: generator
+ports:
+  - port: 8081
+    targetPort: 8081
+    name: http
+metrics:
+  scrape: true
+  port: 5000
+  path: /metrics
+hpa: false
