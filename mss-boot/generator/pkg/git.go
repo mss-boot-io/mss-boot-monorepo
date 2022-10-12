@@ -64,7 +64,7 @@ func GitClone(url, branch, directory string, noCheckout bool, accessToken string
 		auth.Username = "lwnmengjing"
 		auth.Password = accessToken
 	}
-	directory += "/" + branch
+	fmt.Println(directory)
 	if PathExist(directory) {
 		r, err := git.PlainOpen(directory)
 		if err != nil {
