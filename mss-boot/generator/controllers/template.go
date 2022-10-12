@@ -206,11 +206,11 @@ func (e Template) Generate(c *gin.Context) {
 		req.Template.Branch = "main"
 	}
 	//获取模版, 存放位置: temp/provider/owner/repo
-	dir := fmt.Sprintf("temp/%s", strings.ReplaceAll(
+	dir := fmt.Sprintf("temp/%s/%s", strings.ReplaceAll(
 		strings.ReplaceAll(req.Template.Source, "https://", ""),
 		"http://",
 		"",
-	))
+	), req.Template.Branch)
 	//获取新代码
 	_, err = pkg.GitClone(
 		req.Template.Source,
@@ -241,11 +241,11 @@ func (e Template) Generate(c *gin.Context) {
 		destination = filepath.Join(destination, req.Generate.Service)
 	}
 	err = pkg.Generate(&pkg.TemplateConfig{
-		Service:              req.Template.Path,
-		TemplateLocal:        dir,
-		TemplateLocalSubPath: req.Template.Branch,
-		Destination:          destination,
-		Params:               req.Generate.Params,
+		Service:       req.Template.Path,
+		TemplateLocal: dir,
+		//TemplateLocalSubPath: req.Template.Branch,
+		Destination: destination,
+		Params:      req.Generate.Params,
 	})
 	if err != nil {
 		e.Log.Error(err)

@@ -134,6 +134,8 @@ func (e *Tenant) InitStore() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	ctx, cancel := context.WithTimeout(context.TODO(), 10*time.Second)
+	defer cancel()
 	for cur.Next(context.TODO()) {
 		var tenant Tenant
 		err := cur.Decode(&tenant)
@@ -145,7 +147,7 @@ func (e *Tenant) InitStore() {
 			log.Fatal(err)
 		}
 		for _, domain := range tenant.Domains {
-			_, err = c.Set(context.TODO(), &pb.SetReq{
+			_, err = c.Set(ctx, &pb.SetReq{
 				Key:   fmt.Sprintf("tenant_%s", domain),
 				Value: string(rb),
 			})

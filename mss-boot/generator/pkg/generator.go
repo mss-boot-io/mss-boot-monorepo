@@ -34,8 +34,9 @@ type Generator struct {
 }
 
 // Generate example
-//func Generate(url, destinationPath string, cfg interface{}, githubConfig *GithubConfig, accessToken string) error {
-//	templatePath := filepath.Base(url)
+//
+//	func Generate(url, destinationPath string, cfg interface{}, githubConfig *GithubConfig, accessToken string) error {
+//		templatePath := filepath.Base(url)
 func Generate(c *TemplateConfig) (err error) {
 	var templatePath string
 	if c.TemplateLocal != "" {
