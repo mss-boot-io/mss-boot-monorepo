@@ -16,5 +16,7 @@
 vendor/
 
 cfg/*-local*
+cfg/*-beta*
+cfg/*-prod*
 
 admin

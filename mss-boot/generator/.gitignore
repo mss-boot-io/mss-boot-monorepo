@@ -15,8 +15,12 @@
 # Dependency directories (remove the comment below to include it)
 vendor/
 
-cfg/*.yml
-cfg/*.yaml
+cfg/*-local.yml
+cfg/*-beta.yml
+cfg/*-prod.yml
+cfg/*-local.yaml
+cfg/*-beta.yaml
+cfg/*-prod.yaml
 
 temp/
 

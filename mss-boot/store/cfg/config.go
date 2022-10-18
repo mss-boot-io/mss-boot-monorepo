@@ -28,7 +28,7 @@ type Config struct {
 func (e *Config) Init(handler func(srv *grpc.Server)) {
 	configSource, err := s3.New(
 		s3.WithRegion("ap-northeast-1"),
-		s3.WithBucket("matrix-config-center"),
+		s3.WithBucket("matrixlabs-config-center"),
 		s3.WithDir("mss-boot-io/mss-boot-monorepo/store"),
 		s3.WithTimeout(5*time.Second))
 	if err != nil {
