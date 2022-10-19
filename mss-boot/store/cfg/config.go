@@ -1,14 +1,11 @@
 package cfg
 
 import (
-	"time"
-
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/core/server"
 	"github.com/mss-boot-io/mss-boot/core/server/grpc"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
-	"github.com/mss-boot-io/mss-boot/pkg/config/source/s3"
 )
 
 var Cfg Config
@@ -26,16 +23,7 @@ type Config struct {
 }
 
 func (e *Config) Init(handler func(srv *grpc.Server)) {
-	configSource, err := s3.New(
-		s3.WithRegion("ap-northeast-1"),
-		s3.WithBucket("matrixlabs-config-center"),
-		s3.WithDir("mss-boot-io/mss-boot-monorepo/store"),
-		s3.WithTimeout(5*time.Second))
-	if err != nil {
-		log.Fatalf("cfg(s3) init failed, %s\n", err.Error())
-	}
-	err = config.Init(configSource, &Cfg)
-	//err := config.Init(Embedded, &Cfg)
+	err := config.Init(Embedded, &Cfg)
 	if err != nil {
 		log.Fatalf("cfg init failed, %s\n", err.Error())
 	}
