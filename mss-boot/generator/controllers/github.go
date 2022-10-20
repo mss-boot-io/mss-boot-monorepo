@@ -23,7 +23,7 @@ import (
 )
 
 func init() {
-	e := &Template{}
+	e := &Github{}
 	response.AppendController(e)
 }
 
