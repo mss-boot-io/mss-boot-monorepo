@@ -21,3 +21,7 @@ clients:
   store:
     addr: localhost:9090
     timeout: 10s
+database:
+  url: ''
+  name: mss_boot_admin
+  timeout: 10s

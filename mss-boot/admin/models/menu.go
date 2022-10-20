@@ -28,7 +28,7 @@ func init() {
 
 // Menu <no value>
 type Menu struct {
-	ID         string      `bson:"id" json:"id"`
+	ID         string      `bson:"_id" json:"id"`
 	TenantID   string      `bson:"tenantID" json:"tenantID"`
 	Name       string      `bson:"name" json:"name"`
 	Icon       string      `bson:"icon" json:"icon"`

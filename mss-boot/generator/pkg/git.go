@@ -17,6 +17,7 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
 	"github.com/google/go-github/v41/github"
@@ -189,7 +190,7 @@ func GetGithubRepoAllBranches(ctx context.Context, organization, name, token str
 //}
 
 // CommitAndPushGithubRepo commit and push github repo
-func CommitAndPushGithubRepo(directory, branch, path, accessToken string) error {
+func CommitAndPushGithubRepo(directory, branch, path, accessToken string, auth *http.BasicAuth) error {
 	r, err := git.PlainOpen(directory)
 	if err != nil {
 		log.Println(err)
@@ -218,15 +219,17 @@ func CommitAndPushGithubRepo(directory, branch, path, accessToken string) error 
 		log.Println(err)
 		return err
 	}
-	_, err = w.Commit(":tada: generate "+path, &git.CommitOptions{All: true})
+	_, err = w.Commit(":tada: generate "+path, &git.CommitOptions{
+		All: true,
+		Author: &object.Signature{
+			Email: auth.Username,
+		},
+	})
 	if err != nil {
 		log.Println(err)
 		return err
 	}
 	return r.Push(&git.PushOptions{
-		Auth: &http.BasicAuth{
-			Username: "lwnmengjing",
-			Password: accessToken,
-		},
+		Auth: auth,
 	})
 }

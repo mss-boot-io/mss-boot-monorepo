@@ -39,6 +39,7 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	e.Logger.Init()
+	e.Database.Init()
 
 	if len(e.Clients) > 0 {
 		err = e.Clients.Init()
