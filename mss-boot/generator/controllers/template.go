@@ -8,17 +8,20 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
+	tenant "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator/models"
 	"github.com/mss-boot-io/mss-boot/pkg/middlewares"
 	"net/http"
 	"path/filepath"
 	"strings"
 
 	"github.com/gin-gonic/gin"
+	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/google/uuid"
 	"github.com/mss-boot-io/mss-boot/pkg/response"
 
-	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator/cfg"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator/form"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator/pkg"
 )
@@ -47,7 +50,7 @@ func (e Template) Other(r *gin.RouterGroup) {
 // GetBranches 获取template分支
 // @Summary 获取template分支
 // @Description 获取template分支
-// @Tags admin
+// @Tags generator
 // @Accept  application/json
 // @Product application/json
 // @Param source query string true "template source"
@@ -61,8 +64,13 @@ func (e Template) GetBranches(c *gin.Context) {
 		e.Err(http.StatusUnprocessableEntity, err)
 		return
 	}
+	g, err := getGithubConfig(c)
+	if err != nil {
+		e.Err(http.StatusInternalServerError, err)
+		return
+	}
 	s := strings.Split(req.Source, "/")
-	branches, err := pkg.GetGithubRepoAllBranches(c, s[len(s)-2], s[len(s)-1], cfg.Cfg.Github.PersonalAccessToken)
+	branches, err := pkg.GetGithubRepoAllBranches(c, s[len(s)-2], s[len(s)-1], g.Password)
 	if err != nil {
 		e.Log.Error(err)
 		e.Err(http.StatusInternalServerError, err)
@@ -80,7 +88,7 @@ func (e Template) GetBranches(c *gin.Context) {
 // GetPath 获取template文件路径list
 // @Summary 获取template文件路径list
 // @Description 获取template文件路径list
-// @Tags admin
+// @Tags generator
 // @Accept  application/json
 // @Product application/json
 // @Param source query string true "template source"
@@ -95,6 +103,12 @@ func (e Template) GetPath(c *gin.Context) {
 		e.Err(http.StatusUnprocessableEntity, err)
 		return
 	}
+	g, err := getGithubConfig(c)
+	if err != nil {
+		e.Err(http.StatusInternalServerError, err)
+		return
+	}
+
 	if req.Branch == "" {
 		req.Branch = "main"
 	}
@@ -105,7 +119,7 @@ func (e Template) GetPath(c *gin.Context) {
 		"",
 	), req.Branch)
 	//获取最新代码
-	_, err = pkg.GitClone(req.Source, req.Branch, dir, false, cfg.Cfg.Github.PersonalAccessToken)
+	_, err = pkg.GitClone(req.Source, req.Branch, dir, false, g.Password)
 	//更新
 	if err != nil {
 		e.Log.Error(err)
@@ -131,7 +145,7 @@ func (e Template) GetPath(c *gin.Context) {
 // GetParams 获取template参数配置
 // @Summary 获取template参数配置
 // @Description 获取template参数配置
-// @Tags admin
+// @Tags generator
 // @Accept  application/json
 // @Product application/json
 // @Param source query string true "template source"
@@ -147,6 +161,12 @@ func (e Template) GetParams(c *gin.Context) {
 		e.Err(http.StatusUnprocessableEntity, err)
 		return
 	}
+	g, err := getGithubConfig(c)
+	if err != nil {
+		e.Err(http.StatusInternalServerError, err)
+		return
+	}
+
 	if req.Branch == "" {
 		req.Branch = "main"
 	}
@@ -157,7 +177,7 @@ func (e Template) GetParams(c *gin.Context) {
 		"",
 	), req.Branch)
 	//获取最新代码
-	_, err = pkg.GitClone(req.Source, req.Branch, dir, false, cfg.Cfg.Github.PersonalAccessToken)
+	_, err = pkg.GitClone(req.Source, req.Branch, dir, false, g.Password)
 	//更新
 	if err != nil {
 		e.Log.Error(err)
@@ -188,7 +208,7 @@ func (e Template) GetParams(c *gin.Context) {
 // Generate 从模版生成代码
 // @Summary 从模版生成代码
 // @Description 从模版生成代码
-// @Tags admin
+// @Tags generator
 // @Accept  application/json
 // @Product application/json
 // @Param data body form.TemplateGenerateReq true "data"
@@ -202,6 +222,12 @@ func (e Template) Generate(c *gin.Context) {
 		e.Err(http.StatusUnprocessableEntity, err)
 		return
 	}
+	g, err := getGithubConfig(c)
+	if err != nil {
+		e.Err(http.StatusInternalServerError, err)
+		return
+	}
+
 	if req.Template.Branch == "" {
 		req.Template.Branch = "main"
 	}
@@ -215,7 +241,7 @@ func (e Template) Generate(c *gin.Context) {
 	_, err = pkg.GitClone(
 		req.Template.Source,
 		req.Template.Branch, dir, false,
-		cfg.Cfg.Github.PersonalAccessToken)
+		g.Password)
 	if err != nil {
 		e.Log.Error(err)
 		e.Err(http.StatusInternalServerError, err)
@@ -230,7 +256,7 @@ func (e Template) Generate(c *gin.Context) {
 		"",
 	), branch)
 
-	_, err = pkg.GitClone(req.Generate.Repo, "", codeDir, false, cfg.Cfg.Github.PersonalAccessToken)
+	_, err = pkg.GitClone(req.Generate.Repo, "", codeDir, false, g.Password)
 	if err != nil {
 		e.Log.Error(err)
 		e.Err(http.StatusInternalServerError, err)
@@ -252,7 +278,11 @@ func (e Template) Generate(c *gin.Context) {
 		e.Err(http.StatusInternalServerError, err)
 		return
 	}
-	err = pkg.CommitAndPushGithubRepo(codeDir, branch, req.Generate.Service, cfg.Cfg.Github.PersonalAccessToken)
+	err = pkg.CommitAndPushGithubRepo(codeDir, branch, req.Generate.Service, g.Password,
+		&gitHttp.BasicAuth{
+			Username: g.Username,
+			Password: g.Password,
+		})
 	if err != nil {
 		e.Log.Error(err)
 		e.Err(http.StatusInternalServerError, err)
@@ -263,4 +293,19 @@ func (e Template) Generate(c *gin.Context) {
 		Branch: branch,
 	}
 	e.OK(resp)
+}
+
+// getGithubConfig 获取github配置
+func getGithubConfig(c *gin.Context) (g *models.Github, err error) {
+	user := middlewares.GetLoginUser(c)
+	if user == nil {
+		return nil, errors.New("user not found")
+	}
+	t := tenant.Tenant{}
+	err = t.GetTenantByDomain(c, c.Request.Host)
+	if err != nil {
+		return nil, err
+	}
+	//todo 需要改成各人的
+	return models.GetMyGithubConfig(c, t.ID, "lwnmengjing@qq.com")
 }

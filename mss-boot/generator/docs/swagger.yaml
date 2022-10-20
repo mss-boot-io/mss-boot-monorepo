@@ -12,6 +12,29 @@ definitions:
     required:
     - repo
     type: object
+  form.GithubCreateReq:
+    properties:
+      password:
+        description: github密码或者token
+        type: string
+    required:
+    - password
+    type: object
+  form.GithubGetResp:
+    properties:
+      configured:
+        description: 已配置
+        type: boolean
+      createdAt:
+        description: 创建时间
+        type: string
+      email:
+        description: github邮箱
+        type: string
+      updatedAt:
+        description: 更新时间
+        type: string
+    type: object
   form.TemplateGenerateReq:
     properties:
       generate:
@@ -86,6 +109,48 @@ info:
   title: generator API
   version: 0.0.1
 paths:
+  /generator/api/v1/github/create-or-update:
+    post:
+      consumes:
+      - application/json
+      description: 创建或更新github配置
+      parameters:
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/form.GithubCreateReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 创建或更新github配置
+      tags:
+      - generator
+  /generator/api/v1/github/get:
+    get:
+      consumes:
+      - application/json
+      description: 获取github配置
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.GithubGetResp'
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取github配置
+      tags:
+      - generator
   /generator/api/v1/template/generate:
     post:
       consumes:
@@ -112,7 +177,7 @@ paths:
       - Bearer: []
       summary: 从模版生成代码
       tags:
-      - admin
+      - generator
   /generator/api/v1/template/get-branches:
     get:
       consumes:
@@ -138,7 +203,7 @@ paths:
       - Bearer: []
       summary: 获取template分支
       tags:
-      - admin
+      - generator
   /generator/api/v1/template/get-params:
     get:
       consumes:
@@ -172,7 +237,7 @@ paths:
       - Bearer: []
       summary: 获取template参数配置
       tags:
-      - admin
+      - generator
   /generator/api/v1/template/get-path:
     get:
       consumes:
@@ -202,7 +267,7 @@ paths:
       - Bearer: []
       summary: 获取template文件路径list
       tags:
-      - admin
+      - generator
 securityDefinitions:
   Bearer:
     in: header

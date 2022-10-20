@@ -109,7 +109,6 @@ func (e *Tenant) C() *mongo.Collection {
 
 // GetClientByDomain 获取租户的client
 func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAuth2Configure, error) {
-	fmt.Println(domain)
 	if e.storeClient == nil {
 		e.storeClient = client.Store().GetClient()
 	}
@@ -118,12 +117,24 @@ func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAut
 		return nil, err
 	}
 	data := &OnlyClient{}
-	fmt.Println(resp.Value)
 	err = json.Unmarshal([]byte(resp.Value), data)
 	if err != nil {
 		return nil, err
 	}
 	return &data.Client, nil
+}
+
+// GetTenantByDomain 获取租户
+func (e *Tenant) GetTenantByDomain(c context.Context, domain string) error {
+	if e.storeClient == nil {
+		e.storeClient = client.Store().GetClient()
+	}
+	resp, err := e.storeClient.Get(c, &pb.GetReq{Key: fmt.Sprintf("tenant_%s", domain)})
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal([]byte(resp.Value), e)
+	return err
 }
 
 func (e *Tenant) InitStore() {
