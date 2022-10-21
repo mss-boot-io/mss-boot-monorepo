@@ -9,3 +9,6 @@ metrics:
   port: 5000
   path: /metrics
 hpa: false
+configData:
+  name: mss-boot-admin-config
+  path: /app/cfg

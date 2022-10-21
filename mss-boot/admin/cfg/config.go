@@ -8,12 +8,14 @@
 package cfg
 
 import (
+	"net/http"
+
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/core/server"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
-	"net/http"
+	"github.com/mss-boot-io/mss-boot/pkg/config/source/local"
 )
 
 var Cfg Config
@@ -29,7 +31,11 @@ type Config struct {
 }
 
 func (e *Config) Init(handler http.Handler) {
-	err := config.Init(Embedded, &Cfg)
+	frs, err := local.New(local.WithDir("cfg"))
+	if err != nil {
+		log.Fatalf("cfg init failed, %s\n", err.Error())
+	}
+	err = config.Init(frs, &Cfg)
 	if err != nil {
 		log.Fatalf("cfg init failed, %s\n", err.Error())
 	}

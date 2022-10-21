@@ -6,6 +6,7 @@ import (
 	"github.com/mss-boot-io/mss-boot/core/server/grpc"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
+	"github.com/mss-boot-io/mss-boot/pkg/config/source/local"
 )
 
 var Cfg Config
@@ -23,7 +24,11 @@ type Config struct {
 }
 
 func (e *Config) Init(handler func(srv *grpc.Server)) {
-	err := config.Init(Embedded, &Cfg)
+	frs, err := local.New(local.WithDir("cfg"))
+	if err != nil {
+		log.Fatalf("cfg init failed, %s\n", err.Error())
+	}
+	err = config.Init(frs, &Cfg)
 	if err != nil {
 		log.Fatalf("cfg init failed, %s\n", err.Error())
 	}
