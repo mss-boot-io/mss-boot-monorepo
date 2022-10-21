@@ -87,7 +87,7 @@ jobs:
           ./workflow-tools mk --docker-push=true --generate-cdk8s=true --store-provider=local
         env:
           leaf: ${{ inputs.leaf }}
-          cmd: cp -r ../../bin ./ && make generate && make test && make build
+          cmd: cp -r ../../bin ./ && go mod tidy && make generate && make test && make build
           docker_organize: mssbootio
           docker_tags: ${{ inputs.image_tags }}
           ci: true

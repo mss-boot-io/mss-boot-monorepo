@@ -308,8 +308,8 @@ github.com/mss-boot-io/mss-boot/client v0.0.1 h1:azLMoCFBtyCi+vTh7on0gk2RFgarQw9
 github.com/mss-boot-io/mss-boot/client v0.0.1/go.mod h1:eJgqj+K9QcEQ0m46Nn8lkpWlR69OG9vmNbKlFfy0Yuo=
 github.com/mss-boot-io/mss-boot/core v0.0.2 h1:7sqEVXq/riAp5YOcS7DGTbgX3Ci+3loo+PO9rr/L8zY=
 github.com/mss-boot-io/mss-boot/core v0.0.2/go.mod h1:aDGRFOOSGmEbjKMdHwhtl4TcXvxzbl892DZL6y6BNJE=
-github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221020020445-4c72b8752e07 h1:TbMhzT0UcMNOKOlwxAH0EY0In4AKSj1/Ex3AtBEvtEc=
-github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221020020445-4c72b8752e07/go.mod h1:R22h4Y9sKC6tFaZE+Zqlxq+zopU5yXlQLJVhoBjE+OM=
+github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221021104239-ae78caf2490e h1:C6hNn1pURFAsBpycP3TJc7BLtJqHKm8MvK05iIIP8Xs=
+github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221021104239-ae78caf2490e/go.mod h1:R22h4Y9sKC6tFaZE+Zqlxq+zopU5yXlQLJVhoBjE+OM=
 github.com/mss-boot-io/mss-boot/proto v0.0.1 h1:py+//lkogrYOxRRsVCj7xPsWgEm4iawOQ+sPv5W9DWI=
 github.com/mss-boot-io/mss-boot/proto v0.0.1/go.mod h1:SXMU9Ln1j84aCZU+A7aRa93DDeBNZf3xC0UbGdoqRV8=
 github.com/mwitkow/go-conntrack v0.0.0-20161129095857-cc309e4a2223/go.mod h1:qRWi+5nqEBWmkhHvq77mSJWrCKwh8bxhgT7d/eI7P4U=
