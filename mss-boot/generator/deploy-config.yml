@@ -9,3 +9,6 @@ metrics:
   port: 5000
   path: /metrics
 hpa: false
+config:
+  - name: mss-boot-generator-config
+    path: /app/cfg

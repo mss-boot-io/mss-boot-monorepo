@@ -13,11 +13,11 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	tenant "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
 	"github.com/mss-boot-io/mss-boot/pkg/middlewares"
 	"github.com/mss-boot-io/mss-boot/pkg/response"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 
+	tenant "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator/form"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator/models"
 )
@@ -27,6 +27,7 @@ func init() {
 	response.AppendController(e)
 }
 
+// Github github
 type Github struct {
 	response.Api
 }
