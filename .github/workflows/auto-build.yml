@@ -54,6 +54,7 @@ jobs:
       leaf: ${{ needs.leaf.outputs.leaf }}
       image_tags: ${{ github.sha }}
       stage: beta
+      downloadArtifact: true
     secrets:
       aws_region: ${{ secrets.aws_region }}
       aws_account: ${{ secrets.aws_account }}

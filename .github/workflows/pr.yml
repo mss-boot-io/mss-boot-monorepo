@@ -12,6 +12,48 @@ jobs:
       - uses: actions/labeler@v3
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
+
+  leaf:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'workflow_dispatch' }}
+    outputs:
+      leaf: ${{ steps.changed.outputs.leaf }}
+      need_ci: ${{ steps.changed.outputs.need_ci }}
+    env:
+      repo: ${{ github.repository }}
+      mark: ${{ github.sha }}
+      pr_num: ${{ github.event.pull_request.number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: get workflow-tools
+        run: |
+          wget https://github.com/mss-boot-io/workflow-tools-go/releases/download/v0.0.1/workflow-tools
+          chmod +x ./workflow-tools
+
+      - id: changed_files
+        name: git change sets
+        run: ./workflow-tools change --store-provider=local
+        env:
+          accessToken: ${{ github.token }}
+
+      - id: changed
+        run: ./workflow-tools dep --store-provider=local
+        env:
+          workspace: ${{ github.workspace }}
+          ignore_paths: bin,.github
+          filename: go.mod
+          project_name_match: 'module github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/\s(.+)'
+          dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
+          github_repository: ${{ github.repository }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: artifact
+          retention-days: 1
   cicd:
     uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
     needs: triage
@@ -20,6 +62,7 @@ jobs:
       image_tags: ${{ github.sha }}
       stage: beta
       pr_number: ${{ github.event.pull_request.number }}
+      downloadArtifact: true
     secrets:
       aws_region: ${{ secrets.aws_region }}
       aws_account: ${{ secrets.aws_account }}
