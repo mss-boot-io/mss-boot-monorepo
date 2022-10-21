@@ -41,6 +41,12 @@ jobs:
           filename: go.mod
           project_name_match: 'module github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/\s(.+)'
           dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifact
+          path: artifact
+          retention-days: 1
 
   cicd:
     uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@feat/runner-public
