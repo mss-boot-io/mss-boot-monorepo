@@ -77,6 +77,9 @@ jobs:
       - name: install swag
         run: go install github.com/swaggo/swag/cmd/swag@latest
 
+      - name: Add Artifact Dir
+        run: mkdir dist
+
       - name: Build && Deploy
         run: |
           wget https://github.com/mss-boot-io/workflow-tools-go/releases/download/v0.0.1/workflow-tools

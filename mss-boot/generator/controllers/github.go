@@ -27,6 +27,7 @@ func init() {
 	response.AppendController(e)
 }
 
+// Github github
 type Github struct {
 	response.Api
 }
