@@ -12,81 +12,17 @@ jobs:
       - uses: actions/labeler@v3
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-  leaf:
-    runs-on: self-hosted
+  cicd:
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
     needs: triage
-    outputs:
-      leaf: ${{ steps.changed.outputs.leaf }}
-      need_ci: ${{ steps.changed.outputs.need_ci }}
-      changed: ${{ steps.changed.outputs.changed }}
-      lib: ${{ steps.changed.outputs.lib }}
-      test_report: ${{ steps.get_report_url.outputs.all }}
-    env:
-      repo: ${{ github.repository }}
-      mark: ${{ github.event.pull_request.number }}
-      bucket: matrixlabs-github-runner-artifact
-      region: ${{ secrets.aws_region }}
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: get workflow-tools
-        run: |
-          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
-          chmod +x ./workflow-tools
-
-      - id: changed_files
-        name: git-changesets
-        run: ./workflow-tools change
-        env:
-          accessToken: ${{ github.token }}
-
-      - id: changed
-        name: Download Workflow Tools
-        run: |
-          ./workflow-tools dep
-        env:
-          workspace: ${{ github.workspace }}
-          ignore_paths: bin,.github
-          github_repository: ${{ github.repository }}
-          cloudfront_url: https://d3p3arc4rj73mc.cloudfront.net
-          pr_num: ${{ github.event.pull_request.number }}
-          filename: go.mod
-          project_name_match: 'module github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/\s(.+)'
-          dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
-
-      - id: get_report_url
-        name: Get Test Report URl
-        run: echo "::set-output name=all::"$(aws s3 cp s3://matrixlabs-github-runner-artifact/${{ github.repository }}/${{ github.sha }}/artifact/workflow/service.json - | jq -r '.[]')
-
-  check:
-    runs-on: self-hosted
-    needs: leaf
-    env:
-      repo: ${{ github.repository }}
-      mark: ${{ github.event.pull_request.number }}
-      bucket: matrixlabs-github-runner-artifact
-      region: ${{ secrets.aws_region }}
-    steps:
-      - uses: actions/checkout@v3
-
-      - uses: actions/setup-go@v3
-        with:
-          go-version: '1.18'
-
-      - name: install swag
-        run: go install github.com/swaggo/swag/cmd/swag@latest
-
-      - name: Build Check
-        run: |
-          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
-          chmod +x ./workflow-tools
-          ./workflow-tools mk
-        env:
-          coverage_standard: 60
-          repo_path: ${{ github.repository }}
-          pr_number: ${{ github.event.pull_request.number }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          error_block: true
-          leaf: ${{ needs.leaf.outputs.leaf }}
-          cmd: make generate && make test
-          ci: true
+    with:
+      leaf: ${{ needs.leaf.outputs.leaf }}
+      image_tags: ${{ github.sha }}
+      stage: beta
+      pr_number: ${{ github.event.pull_request.number }}
+    secrets:
+      aws_region: ${{ secrets.aws_region }}
+      aws_account: ${{ secrets.aws_account }}
+      gitops_deploy_key: ${{ secrets.gitops_deploy_key }}
+      dockerhub_username: ${{ secrets.dockerhub_username }}
+      dockerhub_token: ${{ secrets.dockerhub_token }}

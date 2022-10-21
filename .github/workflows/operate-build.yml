@@ -7,6 +7,14 @@ on:
         description: "services(json array service name and service type(service or lambda))"
         default: '[{"name": "admin", "type": "service", "language": "golang"}]'
         required: true
+      config_stage:
+        description: "config stage"
+        default: "test"
+        required: true
+      stage:
+        description: "stage"
+        default: "beta"
+        required: true
 
 jobs:
   cicd:
@@ -15,6 +23,8 @@ jobs:
     with:
       leaf: ${{ github.event.inputs.service }}
       image_tags: ${{ github.sha }}
+      stage: ${{ github.event.inputs.stage }}
+      config_stage: ${{ github.event.inputs.config_stage }}
     secrets:
       aws_region: ${{ secrets.aws_region }}
       aws_account: ${{ secrets.aws_account }}
