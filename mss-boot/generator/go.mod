@@ -10,7 +10,7 @@ require (
 	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin v0.0.0-20221020015004-2edff4be4164
 	github.com/mss-boot-io/mss-boot/client v0.0.1
 	github.com/mss-boot-io/mss-boot/core v0.0.2
-	github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221020020445-4c72b8752e07
+	github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221021104239-ae78caf2490e
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.7.9
 	github.com/zealic/xignore v0.3.3
