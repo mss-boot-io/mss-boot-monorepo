@@ -3,7 +3,7 @@ name: Tag For Prod
 on:
   push:
     tags:
-      - '*/v*'
+      - '*/*/v*'
 
 jobs:
   pre:
