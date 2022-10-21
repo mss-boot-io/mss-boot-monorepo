@@ -56,7 +56,7 @@ jobs:
           retention-days: 1
   cicd:
     uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
-    needs: triage
+    needs: [ triage, leaf ]
     with:
       leaf: ${{ needs.leaf.outputs.leaf }}
       image_tags: ${{ github.sha }}
