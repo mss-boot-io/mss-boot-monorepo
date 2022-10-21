@@ -11,10 +11,15 @@ on:
         required: false
         default: ${{ github.sha }}
         type: string
-      config_stage:
-        description: 'config stage'
+      stage:
+        description: 'stage'
         required: false
-        default: 'test'
+        default: 'alpha'
+        type: string
+      pr_number:
+        description: 'pr number'
+        required: false
+        default: ''
         type: string
     secrets:
       aws_account:
@@ -82,7 +87,30 @@ jobs:
           docker_organize: mssbootio
           docker_tags: ${{ inputs.image_tags }}
           ci: true
-          config_stage: ${{ inputs.config_stage }}
+          config_stage: ${{ inputs.stage }}
+          coverage_standard: 60
+          repo_path: ${{ github.repository }}
+          pr_number: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          error_block: true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ inputs.stage }}-${{ github.sha}}
+          path: dist
+          retention-days: 3
+
+  deployment:
+    name: deployment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.stage }}
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-${{ inputs.stage }}-${{ github.sha}}
+          path: dist
 
       - name: Push K8S Yaml
         uses: peaceiris/actions-gh-pages@v3

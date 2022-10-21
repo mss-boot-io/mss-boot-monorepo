@@ -33,6 +33,7 @@ jobs:
     with:
       leaf: ${{ needs.pre.outputs.leaf }}
       image_tags: ${{ needs.pre.outputs.tag }}
+      stage: prod
     secrets:
       aws_region: ${{ secrets.aws_region }}
       aws_account: ${{ secrets.aws_account }}
