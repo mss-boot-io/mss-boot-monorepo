@@ -4,10 +4,11 @@ on:
   push:
     branches:
       - main
+      - feat/runner-public
 
 jobs:
   leaf:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ github.event_name != 'workflow_dispatch' }}
     outputs:
       leaf: ${{ steps.changed.outputs.leaf }}
@@ -23,7 +24,7 @@ jobs:
 
       - name: get workflow-tools
         run: |
-          aws s3 cp s3://matrixlabs-github-runner-artifact/WhiteMatrixTech/workflow-tools-go/v1.0.3/bin/workflow-tools . --quiet
+          wget https://github.com/mss-boot-io/workflow-tools-go/releases/download/v0.0.1/workflow-tools
           chmod +x ./workflow-tools
 
       - id: changed_files
@@ -33,7 +34,7 @@ jobs:
           accessToken: ${{ github.token }}
 
       - id: changed
-        run: ./workflow-tools dep
+        run: ./workflow-tools dep --store-provider=local
         env:
           workspace: ${{ github.workspace }}
           ignore_paths: bin,.github
@@ -42,7 +43,7 @@ jobs:
           dependence_match: 'github\.com\/mss-boot-io\/mss-boot-monorepo\/mss-boot\/(.+) v'
 
   cicd:
-    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@feat/runner-public
     needs: leaf
     with:
       leaf: ${{ needs.leaf.outputs.leaf }}
