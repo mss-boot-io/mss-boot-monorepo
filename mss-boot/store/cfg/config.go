@@ -23,6 +23,7 @@ type Config struct {
 	Provider Provider       `yaml:"provider" json:"provider"`
 }
 
+// Init init
 func (e *Config) Init(handler func(srv *grpc.Server)) {
 	frs, err := local.New(local.WithDir("cfg"))
 	if err != nil {
