@@ -60,7 +60,7 @@ jobs:
     with:
       leaf: ${{ needs.leaf.outputs.leaf }}
       image_tags: ${{ github.sha }}
-      stage: beta
+      stage: alpha
       pr_number: ${{ github.event.pull_request.number }}
       downloadArtifact: true
     secrets:
