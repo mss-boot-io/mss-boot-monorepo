@@ -3,7 +3,7 @@ name: Tag For Prod
 on:
   push:
     tags:
-      - '*/v*'
+      - '*/*/v*'
 
 jobs:
   pre:
@@ -25,7 +25,7 @@ jobs:
           export a=${ref#*refs/tags/mss-boot/}
           export service=${a%/*}
           export leaf="[{\"name\": \"${service}\"}]"
-          echo "::set-output name=test::[{\"name\": \"${service}\", \"type\": \"service\"}]"
+          echo "::set-output name=test::[{\"name\": \"${service}\", \"projectPath\":[\"mss-boot\",\"${service}\"], \"type\": \"service\"}]"
 
   cicd:
     uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main

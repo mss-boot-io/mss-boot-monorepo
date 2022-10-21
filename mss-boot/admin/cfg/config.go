@@ -20,6 +20,7 @@ import (
 
 var Cfg Config
 
+// Config 配置
 type Config struct {
 	Logger   config.Logger    `yaml:"logger" json:"logger"`
 	Server   config.Listen    `yaml:"server" json:"server"`
