@@ -105,6 +105,7 @@ jobs:
     name: deployment
     runs-on: ubuntu-latest
     environment: ${{ inputs.stage }}
+    needs: build
     steps:
       - name: Download Artifact
         uses: actions/download-artifact@v3
