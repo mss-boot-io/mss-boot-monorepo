@@ -10,5 +10,5 @@ metrics:
   path: /metrics
 hpa: false
 config:
-  name: mss-boot-admin-config
-  path: /app/cfg
+  - name: mss-boot-admin-config
+    path: /app/cfg
