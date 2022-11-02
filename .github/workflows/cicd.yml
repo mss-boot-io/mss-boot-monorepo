@@ -26,6 +26,21 @@ on:
         required: false
         default: true
         type: boolean
+      argocd_project:
+        description: 'argocd project'
+        required: false
+        default: 'default'
+        type: string
+      gitops_repo:
+        description: 'gitops repo'
+        required: false
+        default: 'https://github.com/mss-boot-io/mss-boot-gitops'
+        type: string
+      gitops_branch:
+        description: 'gitops branch'
+        required: false
+        default: 'main'
+        type: string
     secrets:
       aws_account:
         required: true
@@ -42,6 +57,13 @@ on:
       dockerhub_username:
         required: true
         description: ''
+      argocd_url:
+        required: true
+        description: ''
+      argocd_token:
+        required: true
+        description: ''
+
 
 jobs:
   build:
@@ -88,7 +110,8 @@ jobs:
 
       - name: Build && Deploy
         run: |
-          wget https://github.com/mss-boot-io/workflow-tools-go/releases/download/v0.0.1/workflow-tools
+          wget https://github.com/mss-boot-io/workflow-tools-go/releases/download/v0.0.2/linux_amd64.tar.gz -q
+          tar -zxvf linux_amd64.tar.gz
           chmod +x ./workflow-tools
           ./workflow-tools mk --docker-push=true --generate-cdk8s=true --store-provider=local
         env:
@@ -117,7 +140,17 @@ jobs:
     environment: ${{ inputs.stage }}
     needs: build
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Download Artifact
+        if: ${{ inputs.downloadArtifact }}
+        uses: actions/download-artifact@v3
+        with:
+          name: artifact
+          path: artifact
+
+      - name: Download dist
         uses: actions/download-artifact@v3
         with:
           name: dist-${{ inputs.stage }}-${{ github.sha}}
@@ -130,5 +163,20 @@ jobs:
           publish_dir: ./dist
           keep_files: true
           publish_branch: main
-          destination_dir: mss-boot-monorepo
+          destination_dir: .
           external_repository: mss-boot-io/mss-boot-gitops
+
+      - name: Gitops
+        run: |
+          wget https://github.com/mss-boot-io/workflow-tools-go/releases/download/v0.0.2/linux_amd64.tar.gz -q
+          tar -zxvf linux_amd64.tar.gz
+          chmod +x ./workflow-tools
+          ./workflow-tools gitops --store-provider=local
+        env:
+          argocd_url: ${{ secrets.argocd_url }}
+          argocd_token: ${{ secrets.argocd_token }}
+          argocd_project: ${{ inputs.argocd_project }}
+          gitops_repo: ${{ inputs.gitops_repo }}
+          gitops_branch: ${{ inputs.gitops_branch }}
+          config_stage: ${{ inputs.stage }}
+          error_block: true
