@@ -10,22 +10,25 @@ package models
 import (
 	"context"
 	"errors"
-	"github.com/casdoor/casdoor-go-sdk/auth"
+	"time"
+
+	"github.com/coreos/go-oidc/v3/oidc"
 	"github.com/mss-boot-io/mss-boot/pkg/enum"
+	"github.com/mss-boot-io/mss-boot/pkg/middlewares"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"time"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/security"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 type User struct {
 	ID        string      `bson:"_id" json:"id"`
+	Subject   string      `bson:"subject" json:"subject"`
 	TenantID  string      `bson:"tenantID" json:"tenantID"`
 	Username  string      `bson:"username" json:"username"`
 	Nickname  string      `bson:"nickname" json:"nickname"`
@@ -86,33 +89,47 @@ func (e *User) VerifyPassword(pwd string) bool {
 }
 
 // CreateOrUpdateUser create or update user
-func CreateOrUpdateUser(claims *auth.Claims) {
+func CreateOrUpdateUser(ctx context.Context, domain string, idToken *oidc.IDToken) error {
 	tenant := &Tenant{}
-	err := tenant.C().FindOne(context.TODO(), bson.M{"name": claims.Owner}).Decode(tenant)
+	err := tenant.GetTenantByDomain(ctx, domain)
 	if err != nil {
-		log.Errorf("find admin error: %s", err)
-		return
+		return err
 	}
+	claims := &middlewares.User{}
+	err = idToken.Claims(claims)
+	if err != nil {
+		return nil
+	}
+	//todo set usernamePostfix
 	usernamePostfix := ""
-	if claims.Github != "" {
-		usernamePostfix = "-" + claims.Github
-	}
 	user := &User{
 		TenantID:  tenant.ID,
+		Subject:   claims.Subject,
 		Username:  claims.Name + usernamePostfix,
 		Nickname:  claims.Name + usernamePostfix,
-		Avatar:    claims.Avatar,
+		Avatar:    claims.Audience,
 		Email:     claims.Email,
-		Phone:     claims.Phone,
 		Status:    enum.Enabled,
 		Metadata:  *claims,
 		CreatedAt: time.Now(),
 	}
+	var count int64
+	count, err = user.C().CountDocuments(ctx, bson.M{"username": user.Username, "tenantID": user.TenantID})
+	if err != nil {
+		return err
+	}
+	if count > 0 {
+		//user exist
+		//user.UpdatedAt = time.Now()
+		//// todo update item
+		//_, err = user.C().UpdateOne(ctx, bson.M{"username": user.Username, "tenantID": user.TenantID}, bson.M{"$set": user})
+		//if err != nil {
+		//	return err
+		//}
+		return nil
+	}
 	user.UpdatedAt = user.CreatedAt
 	user.ID = primitive.NewObjectID().Hex()
-	_, err = user.C().InsertOne(context.TODO(), user)
-	if err != nil {
-		log.Errorf("insert user error: %s", err)
-		return
-	}
+	_, err = user.C().InsertOne(ctx, user)
+	return err
 }

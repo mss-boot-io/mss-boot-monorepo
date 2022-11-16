@@ -3,12 +3,13 @@ module github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin
 go 1.18
 
 require (
-	github.com/casdoor/casdoor-go-sdk v0.4.0
+	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/gin-gonic/gin v1.7.7
 	github.com/mss-boot-io/mss-boot/client v0.0.1
 	github.com/mss-boot-io/mss-boot/core v0.0.2
 	github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221021104239-ae78caf2490e
 	github.com/mss-boot-io/mss-boot/proto v0.0.1
+	github.com/sanity-io/litter v1.5.5
 	github.com/swaggo/gin-swagger v1.4.1
 	github.com/swaggo/swag v1.7.9
 	go.mongodb.org/mongo-driver v1.9.0
@@ -21,7 +22,6 @@ require (
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
-	github.com/coreos/go-oidc/v3 v3.2.0 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
@@ -31,7 +31,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-cmp v0.5.8 // indirect

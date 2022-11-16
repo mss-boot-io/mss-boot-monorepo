@@ -51,6 +51,7 @@ type Tenant struct {
 	storeClient pb.StoreClient `bson:"-"`
 }
 type OnlyClient struct {
+	ID     string        `json:"id" bson:"_id"`
 	Client config.OAuth2 `json:"client" bson:"client"`
 }
 

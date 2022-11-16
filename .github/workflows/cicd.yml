@@ -58,10 +58,10 @@ on:
         required: true
         description: ''
       argocd_url:
-        required: true
+        required: false
         description: ''
       argocd_token:
-        required: true
+        required: false
         description: ''
 
 
