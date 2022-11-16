@@ -11,8 +11,10 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	gitHttp "github.com/go-git/go-git/v5/plumbing/transport/http"
@@ -126,6 +128,12 @@ func (e Template) GetPath(c *gin.Context) {
 		e.Err(http.StatusInternalServerError, err)
 		return
 	}
+	defer func() {
+		go func() {
+			time.Sleep(time.Minute * 10)
+			_ = os.RemoveAll(dir)
+		}()
+	}()
 	resp := &form.TemplateGetPathResp{}
 	resp.Path, err = pkg.GetSubPath(dir)
 	for i := range resp.Path {
@@ -184,6 +192,12 @@ func (e Template) GetParams(c *gin.Context) {
 		e.Err(http.StatusInternalServerError, err)
 		return
 	}
+	defer func() {
+		go func() {
+			time.Sleep(time.Minute * 10)
+			_ = os.RemoveAll(dir)
+		}()
+	}()
 	var keys map[string]string
 	keys, err = pkg.GetParseFromTemplate(dir, req.Path)
 	if err != nil {
@@ -262,6 +276,13 @@ func (e Template) Generate(c *gin.Context) {
 		e.Err(http.StatusInternalServerError, err)
 		return
 	}
+	defer func() {
+		go func() {
+			time.Sleep(time.Minute * 10)
+			_ = os.RemoveAll(dir)
+			_ = os.RemoveAll(codeDir)
+		}()
+	}()
 	destination := codeDir
 	if req.Generate.Service != "" {
 		destination = filepath.Join(destination, req.Generate.Service)
