@@ -38,7 +38,7 @@ func (e User) Other(r *gin.RouterGroup) {
 // @Tags admin
 // @Accept  application/json
 // @Product application/json
-// @Success 200 {object} response.Response{data=auth.Claims}
+// @Success 200 {object} response.Response{data=middlewares.User}
 // @Router /admin/api/v1/current-user [get]
 // @Security Bearer
 func (e User) GetCurrentUser(c *gin.Context) {

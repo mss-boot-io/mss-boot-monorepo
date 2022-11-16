@@ -1,148 +1,4 @@
 definitions:
-  auth.Claims:
-    properties:
-      accessToken:
-        type: string
-      address:
-        items:
-          type: string
-        type: array
-      affiliation:
-        type: string
-      aud:
-        description: the `aud` (Audience) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3
-        items:
-          type: string
-        type: array
-      avatar:
-        type: string
-      bio:
-        type: string
-      birthday:
-        type: string
-      createdIp:
-        type: string
-      createdTime:
-        type: string
-      dingtalk:
-        type: string
-      displayName:
-        type: string
-      education:
-        type: string
-      email:
-        type: string
-      exp:
-        $ref: '#/definitions/jwt.NumericDate'
-        description: the `exp` (Expiration Time) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4
-      facebook:
-        type: string
-      gender:
-        type: string
-      gitee:
-        type: string
-      github:
-        type: string
-      gitlab:
-        type: string
-      google:
-        type: string
-      hash:
-        type: string
-      homepage:
-        type: string
-      iat:
-        $ref: '#/definitions/jwt.NumericDate'
-        description: the `iat` (Issued At) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6
-      id:
-        type: string
-      idCard:
-        type: string
-      idCardType:
-        type: string
-      isAdmin:
-        type: boolean
-      isDefaultAvatar:
-        type: boolean
-      isDeleted:
-        type: boolean
-      isForbidden:
-        type: boolean
-      isGlobalAdmin:
-        type: boolean
-      isOnline:
-        type: boolean
-      iss:
-        description: the `iss` (Issuer) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1
-        type: string
-      jti:
-        description: the `jti` (JWT ID) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7
-        type: string
-      karma:
-        type: integer
-      language:
-        type: string
-      lark:
-        type: string
-      lastSigninIp:
-        type: string
-      lastSigninTime:
-        type: string
-      ldap:
-        type: string
-      linkedin:
-        type: string
-      location:
-        type: string
-      name:
-        type: string
-      nbf:
-        $ref: '#/definitions/jwt.NumericDate'
-        description: the `nbf` (Not Before) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5
-      owner:
-        type: string
-      password:
-        type: string
-      passwordSalt:
-        type: string
-      permanentAvatar:
-        type: string
-      phone:
-        type: string
-      preHash:
-        type: string
-      properties:
-        additionalProperties:
-          type: string
-        type: object
-      qq:
-        type: string
-      ranking:
-        type: integer
-      region:
-        type: string
-      score:
-        type: integer
-      signupApplication:
-        type: string
-      sub:
-        description: the `sub` (Subject) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2
-        type: string
-      tag:
-        type: string
-      title:
-        type: string
-      type:
-        type: string
-      updatedTime:
-        type: string
-      wechat:
-        type: string
-      wecom:
-        type: string
-      weibo:
-        type: string
-    type: object
   form.MenuCreateReq:
     properties:
       access:
@@ -477,9 +333,29 @@ definitions:
     required:
     - expiredAt
     type: object
-  jwt.NumericDate:
+  middlewares.User:
     properties:
-      time.Time:
+      at_hash:
+        type: string
+      aud:
+        type: string
+      email:
+        type: string
+      email_verified:
+        type: boolean
+      exp:
+        type: integer
+      groups:
+        items:
+          type: string
+        type: array
+      iat:
+        type: integer
+      iss:
+        type: string
+      name:
+        type: string
+      sub:
         type: string
     type: object
   response.Page:
@@ -580,7 +456,7 @@ paths:
             - $ref: '#/definitions/response.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/auth.Claims'
+                  $ref: '#/definitions/middlewares.User'
               type: object
       security:
       - Bearer: []
@@ -715,31 +591,6 @@ paths:
       summary: 更新menu
       tags:
       - menu
-  /admin/api/v1/refresh-token:
-    get:
-      consumes:
-      - application/json
-      description: 获取accessToken
-      parameters:
-      - description: refreshToken
-        in: query
-        name: refreshToken
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/form.TenantCallbackResp'
-              type: object
-      security:
-      - Bearer: []
-      summary: 获取accessToken
-      tags:
-      - admin
   /admin/api/v1/tenant:
     get:
       consumes:
@@ -866,6 +717,31 @@ paths:
       security:
       - Bearer: []
       summary: 更新tenant
+      tags:
+      - admin
+  /admin/pi/v1/refresh-token:
+    get:
+      consumes:
+      - application/json
+      description: 获取accessToken
+      parameters:
+      - description: refreshToken
+        in: query
+        name: refreshToken
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/form.TenantCallbackResp'
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取accessToken
       tags:
       - admin
 securityDefinitions:

@@ -138,7 +138,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/auth.Claims"
+                                            "$ref": "#/definitions/middlewares.User"
                                         }
                                     }
                                 }
@@ -361,51 +361,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/admin/api/v1/refresh-token": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "description": "获取accessToken",
-                "consumes": [
-                    "application/json"
-                ],
-                "tags": [
-                    "admin"
-                ],
-                "summary": "获取accessToken",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "refreshToken",
-                        "name": "refreshToken",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/form.TenantCallbackResp"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    }
-                }
-            }
-        },
         "/admin/api/v1/tenant": {
             "get": {
                 "security": [
@@ -618,222 +573,54 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/admin/pi/v1/refresh-token": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "获取accessToken",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "获取accessToken",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "refreshToken",
+                        "name": "refreshToken",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/form.TenantCallbackResp"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "auth.Claims": {
-            "type": "object",
-            "properties": {
-                "accessToken": {
-                    "type": "string"
-                },
-                "address": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "affiliation": {
-                    "type": "string"
-                },
-                "aud": {
-                    "description": "the ` + "`" + `aud` + "`" + ` (Audience) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.3",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "avatar": {
-                    "type": "string"
-                },
-                "bio": {
-                    "type": "string"
-                },
-                "birthday": {
-                    "type": "string"
-                },
-                "createdIp": {
-                    "type": "string"
-                },
-                "createdTime": {
-                    "type": "string"
-                },
-                "dingtalk": {
-                    "type": "string"
-                },
-                "displayName": {
-                    "type": "string"
-                },
-                "education": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "exp": {
-                    "description": "the ` + "`" + `exp` + "`" + ` (Expiration Time) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4",
-                    "$ref": "#/definitions/jwt.NumericDate"
-                },
-                "facebook": {
-                    "type": "string"
-                },
-                "gender": {
-                    "type": "string"
-                },
-                "gitee": {
-                    "type": "string"
-                },
-                "github": {
-                    "type": "string"
-                },
-                "gitlab": {
-                    "type": "string"
-                },
-                "google": {
-                    "type": "string"
-                },
-                "hash": {
-                    "type": "string"
-                },
-                "homepage": {
-                    "type": "string"
-                },
-                "iat": {
-                    "description": "the ` + "`" + `iat` + "`" + ` (Issued At) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6",
-                    "$ref": "#/definitions/jwt.NumericDate"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "idCard": {
-                    "type": "string"
-                },
-                "idCardType": {
-                    "type": "string"
-                },
-                "isAdmin": {
-                    "type": "boolean"
-                },
-                "isDefaultAvatar": {
-                    "type": "boolean"
-                },
-                "isDeleted": {
-                    "type": "boolean"
-                },
-                "isForbidden": {
-                    "type": "boolean"
-                },
-                "isGlobalAdmin": {
-                    "type": "boolean"
-                },
-                "isOnline": {
-                    "type": "boolean"
-                },
-                "iss": {
-                    "description": "the ` + "`" + `iss` + "`" + ` (Issuer) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1",
-                    "type": "string"
-                },
-                "jti": {
-                    "description": "the ` + "`" + `jti` + "`" + ` (JWT ID) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7",
-                    "type": "string"
-                },
-                "karma": {
-                    "type": "integer"
-                },
-                "language": {
-                    "type": "string"
-                },
-                "lark": {
-                    "type": "string"
-                },
-                "lastSigninIp": {
-                    "type": "string"
-                },
-                "lastSigninTime": {
-                    "type": "string"
-                },
-                "ldap": {
-                    "type": "string"
-                },
-                "linkedin": {
-                    "type": "string"
-                },
-                "location": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "nbf": {
-                    "description": "the ` + "`" + `nbf` + "`" + ` (Not Before) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5",
-                    "$ref": "#/definitions/jwt.NumericDate"
-                },
-                "owner": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "passwordSalt": {
-                    "type": "string"
-                },
-                "permanentAvatar": {
-                    "type": "string"
-                },
-                "phone": {
-                    "type": "string"
-                },
-                "preHash": {
-                    "type": "string"
-                },
-                "properties": {
-                    "type": "object",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "qq": {
-                    "type": "string"
-                },
-                "ranking": {
-                    "type": "integer"
-                },
-                "region": {
-                    "type": "string"
-                },
-                "score": {
-                    "type": "integer"
-                },
-                "signupApplication": {
-                    "type": "string"
-                },
-                "sub": {
-                    "description": "the ` + "`" + `sub` + "`" + ` (Subject) claim. See https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.2",
-                    "type": "string"
-                },
-                "tag": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "updatedTime": {
-                    "type": "string"
-                },
-                "wechat": {
-                    "type": "string"
-                },
-                "wecom": {
-                    "type": "string"
-                },
-                "weibo": {
-                    "type": "string"
-                }
-            }
-        },
         "form.MenuCreateReq": {
             "type": "object",
             "required": [
@@ -1278,10 +1065,40 @@ const docTemplate = `{
                 }
             }
         },
-        "jwt.NumericDate": {
+        "middlewares.User": {
             "type": "object",
             "properties": {
-                "time.Time": {
+                "at_hash": {
+                    "type": "string"
+                },
+                "aud": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "email_verified": {
+                    "type": "boolean"
+                },
+                "exp": {
+                    "type": "integer"
+                },
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "iat": {
+                    "type": "integer"
+                },
+                "iss": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sub": {
                     "type": "string"
                 }
             }
