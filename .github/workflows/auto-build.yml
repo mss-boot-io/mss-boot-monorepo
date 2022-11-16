@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feat/update-workflow
 
 jobs:
   leaf:
@@ -49,7 +48,7 @@ jobs:
           retention-days: 1
 
   cicd:
-    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@feat/update-workflow
+    uses: mss-boot-io/mss-boot-monorepo/.github/workflows/cicd.yml@main
     needs: leaf
     with:
       leaf: ${{ needs.leaf.outputs.leaf }}
