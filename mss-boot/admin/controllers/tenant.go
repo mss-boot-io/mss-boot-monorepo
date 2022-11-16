@@ -9,11 +9,14 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"golang.org/x/oauth2"
 	"net/http"
 
+	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/gin-gonic/gin"
+	"golang.org/x/oauth2"
+
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/form"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
 	"github.com/mss-boot-io/mss-boot/pkg/response"
 	"github.com/mss-boot-io/mss-boot/pkg/response/curd"
 	"github.com/mss-boot-io/mss-boot/pkg/store"
@@ -230,6 +233,25 @@ func (e Tenant) Callback(c *gin.Context) {
 		RefreshToken: oauth2Token.RefreshToken,
 		Expiry:       oauth2Token.Expiry,
 	}
+	//get user info
+	provider, err := oidc.NewProvider(c, client.GetIssuer())
+	if err != nil {
+		e.Err(http.StatusUnauthorized, err)
+		return
+	}
+	idTokenVerifier := provider.Verifier(&oidc.Config{ClientID: client.GetClientID()})
+	idToken, err := idTokenVerifier.Verify(c, oauth2Token.AccessToken)
+	if err != nil {
+		e.Err(http.StatusUnauthorized, err)
+		return
+	}
+	//insert or update user info
+	err = models.CreateOrUpdateUser(c, c.Request.Host, idToken)
+	if err != nil {
+		e.Err(http.StatusInternalServerError, err)
+		return
+	}
+
 	e.OK(resp)
 	return
 }
@@ -242,7 +264,7 @@ func (e Tenant) Callback(c *gin.Context) {
 // @Product application/json
 // @Param refreshToken query string false "refreshToken"
 // @Success 200 {object} response.Response{data=form.TenantCallbackResp}
-// @Router /admin/api/v1/refresh-token [get]
+// @Router /admin/pi/v1/refresh-token [get]
 // @Security Bearer
 func (e Tenant) RefreshToken(c *gin.Context) {
 	req := &form.TenantRefreshTokenReq{}
