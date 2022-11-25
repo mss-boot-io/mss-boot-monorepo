@@ -47,7 +47,7 @@ type UserPwd struct {
 	Hash string `bson:"hash" json:"hash"`
 }
 
-func (User) TableName() string {
+func (*User) TableName() string {
 	return "user"
 }
 
@@ -132,4 +132,21 @@ func CreateOrUpdateUser(ctx context.Context, domain string, idToken *oidc.IDToke
 	user.ID = primitive.NewObjectID().Hex()
 	_, err = user.C().InsertOne(ctx, user)
 	return err
+}
+
+// GetUserByNameAndDomain get user by subject
+func GetUserByNameAndDomain(ctx context.Context, domain, username string) (*User, error) {
+	tenant := &Tenant{}
+	err := tenant.GetTenantByDomain(ctx, domain)
+	if err != nil {
+		return nil, err
+	}
+	user := &User{}
+	err = user.C().FindOne(ctx,
+		bson.M{"username": username, "tenantID": tenant.ID}).
+		Decode(user)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

@@ -11,10 +11,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mss-boot-io/mss-boot/client"
-	pb "github.com/mss-boot-io/mss-boot/proto/store/v1"
 	"time"
 
+	"github.com/kamva/mgm/v3"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,11 +21,13 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
+	"github.com/mss-boot-io/mss-boot/client"
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/enum"
 	"github.com/mss-boot-io/mss-boot/pkg/store"
+	pb "github.com/mss-boot-io/mss-boot/proto/store/v1"
 )
 
 func init() {
@@ -36,19 +37,20 @@ func init() {
 
 // Tenant 租户
 type Tenant struct {
-	ID          string         `json:"id" bson:"_id"`
-	Name        string         `json:"name" bson:"name"`
-	Contact     string         `json:"contact" bson:"contact"`
-	System      bool           `json:"system" bson:"system"`
-	Status      enum.Status    `json:"status" bson:"status"`
-	Description string         `json:"description" bson:"description"`
-	Domains     []string       `json:"domains" bson:"domains"`
-	Client      config.OAuth2  `json:"client" bson:"client"`
-	Metadata    interface{}    `json:"metadata" bson:"metadata"`
-	ExpiredAt   time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
-	CreatedAt   time.Time      `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt" bson:"updatedAt"`
-	storeClient pb.StoreClient `bson:"-"`
+	mgm.DefaultModel `bson:",inline"`
+	ID               string         `json:"id" bson:"_id"`
+	Name             string         `json:"name" bson:"name"`
+	Contact          string         `json:"contact" bson:"contact"`
+	System           bool           `json:"system" bson:"system"`
+	Status           enum.Status    `json:"status" bson:"status"`
+	Description      string         `json:"description" bson:"description"`
+	Domains          []string       `json:"domains" bson:"domains"`
+	Client           config.OAuth2  `json:"client" bson:"client"`
+	Metadata         interface{}    `json:"metadata" bson:"metadata"`
+	ExpiredAt        time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
+	CreatedAt        time.Time      `json:"createdAt" bson:"createdAt"`
+	UpdatedAt        time.Time      `json:"updatedAt" bson:"updatedAt"`
+	storeClient      pb.StoreClient `bson:"-"`
 }
 type OnlyClient struct {
 	ID     string        `json:"id" bson:"_id"`
@@ -59,7 +61,7 @@ func NewTenant(storeclient pb.StoreClient) *Tenant {
 	return &Tenant{storeClient: storeclient}
 }
 
-func (Tenant) TableName() string {
+func (*Tenant) TableName() string {
 	return "tenant"
 }
 

@@ -1,4 +1,11 @@
 definitions:
+  form.KV:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
   form.MenuCreateReq:
     properties:
       access:
@@ -164,6 +171,13 @@ definitions:
     - name
     - path
     - tenantID
+    type: object
+  form.SettingsUpdateReq:
+    properties:
+      settings:
+        items:
+          $ref: '#/definitions/form.KV'
+        type: array
     type: object
   form.TenantCallbackResp:
     properties:
@@ -591,6 +605,60 @@ paths:
       summary: 更新menu
       tags:
       - menu
+  /admin/api/v1/settings:
+    get:
+      consumes:
+      - application/json
+      description: 获取settings
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/form.KV'
+                  type: array
+              type: object
+      security:
+      - Bearer: []
+      summary: 获取settings
+      tags:
+      - settings
+    put:
+      consumes:
+      - application/json
+      description: 更新settings
+      parameters:
+      - description: id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/form.SettingsUpdateReq'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      summary: 更新settings
+      tags:
+      - settings
   /admin/api/v1/tenant:
     get:
       consumes:

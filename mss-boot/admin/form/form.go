@@ -11,3 +11,8 @@ type Pagination struct {
 	Page     int64 `form:"page" query:"page"`
 	PageSize int64 `form:"pageSize" query:"pageSize"`
 }
+
+type KV struct {
+	Key   string `bson:"key" json:"key"`
+	Value string `bson:"value" json:"value"`
+}
