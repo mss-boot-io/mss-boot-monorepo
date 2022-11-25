@@ -12,3 +12,5 @@ hpa: false
 config:
   - name: mss-boot-oos-gateway-config
     path: /app/cfg
+deploy:
+  image: mssbootio/oos-gateway
