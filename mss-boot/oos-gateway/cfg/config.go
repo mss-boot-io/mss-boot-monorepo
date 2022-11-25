@@ -25,6 +25,7 @@ type Config struct {
 	Server  config.Listen  `yaml:"server" json:"server"`
 	Health  *config.Listen `yaml:"health" json:"health"`
 	Metrics *config.Listen `yaml:"metrics" json:"metrics"`
+	OOS     OOS            `yaml:"oos" json:"oos"`
 }
 
 func (e *Config) Init(handler http.Handler) {
@@ -38,6 +39,7 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	e.Logger.Init()
+	e.OOS.Init()
 
 	runnable := []server.Runnable{
 		listener.New("<no value>",

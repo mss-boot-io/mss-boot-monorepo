@@ -2,13 +2,12 @@ package main
 
 import (
 	"context"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/oos-gateway/controllers"
 	"log"
 
-	"github.com/gin-gonic/gin"
 	"github.com/mss-boot-io/mss-boot/core/server"
 
-	"github.com/WhiteMatrixTech/matrix-cloud-monorepo/oos-gateway/cfg"
-	"github.com/WhiteMatrixTech/matrix-cloud-monorepo/oos-gateway/router"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/oos-gateway/cfg"
 )
 
 // @title oos-gateway API
@@ -22,12 +21,9 @@ import (
 func main() {
 	ctx := context.Background()
 
-	r := gin.Default()
-	router.Init(r.Group("/oos-gateway"))
+	cfg.Cfg.Init(&controllers.OOS{})
 
-	cfg.Cfg.Init(r)
-
-	log.Println("starting admin manage")
+	log.Println("starting oss-gateway manage")
 
 	err := server.Manage.Start(ctx)
 	if err != nil {
