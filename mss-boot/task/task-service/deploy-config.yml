@@ -12,3 +12,15 @@ hpa: false
 config:
   - name: mss-boot-task-config
     path: /app/cfg
+deploy:
+  stage:
+    alpha:
+      cluster: matrix-devops
+      namespace: alpha
+      autoSync: true
+    beta:
+      cluster: matrix-devops
+      namespace: beta
+    prod:
+      cluster: matrix-devops
+      namespace: prod

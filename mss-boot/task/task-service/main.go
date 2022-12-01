@@ -7,9 +7,9 @@ import (
 	"github.com/mss-boot-io/mss-boot/core/server"
 	"github.com/mss-boot-io/mss-boot/core/server/grpc"
 
+	pb "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/task-proto/v1"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/task/cfg"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/task/handlers"
-	pb "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/task-proto/v1"
 )
 
 func main() {
