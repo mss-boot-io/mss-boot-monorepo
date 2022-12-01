@@ -69,3 +69,5 @@ jobs:
       gitops_deploy_key: ${{ secrets.gitops_deploy_key }}
       dockerhub_username: ${{ secrets.dockerhub_username }}
       dockerhub_token: ${{ secrets.dockerhub_token }}
+      argocd_url: ${{ secrets.argocd_url }}
+      argocd_token: ${{ secrets.argocd_token }}
