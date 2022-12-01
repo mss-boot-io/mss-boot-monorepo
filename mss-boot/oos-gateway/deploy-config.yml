@@ -14,3 +14,14 @@ config:
     path: /app/cfg
 deploy:
   image: mssbootio/oos-gateway
+  stage:
+    alpha:
+      cluster: matrix-devops
+      namespace: alpha
+      autoSync: true
+    beta:
+      cluster: matrix-devops
+      namespace: beta
+    prod:
+      cluster: matrix-devops
+      namespace: prod
