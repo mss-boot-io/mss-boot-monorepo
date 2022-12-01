@@ -42,7 +42,7 @@ func (e *Config) Init(handler http.Handler) {
 	e.OOS.Init()
 
 	runnable := []server.Runnable{
-		listener.New("<no value>",
+		listener.New("oos-gateway",
 			e.Server.Init(listener.WithHandler(handler))...),
 	}
 	if e.Health != nil {
