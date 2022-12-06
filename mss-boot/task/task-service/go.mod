@@ -8,6 +8,11 @@ require (
 	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/task-proto v0.0.0-00010101000000-000000000000
 	github.com/mss-boot-io/mss-boot/core v0.0.2
 	github.com/mss-boot-io/mss-boot/pkg v0.0.3-0.20221021104239-ae78caf2490e
+	github.com/robfig/cron/v3 v3.0.1
+	github.com/sanity-io/litter v1.5.5
+	github.com/spf13/cast v1.5.0
+	github.com/vmihailenco/msgpack v4.0.4+incompatible
+	github.com/wasmerio/wasmer-go v1.0.4
 	google.golang.org/grpc v1.51.0
 )
 

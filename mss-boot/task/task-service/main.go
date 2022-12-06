@@ -16,11 +16,12 @@ func main() {
 	ctx := context.Background()
 
 	cfg.Cfg.Init(func(srv *grpc.Server) {
-		pb.RegisterHelloworldServer(srv.Server(), handlers.New("task"))
+		pb.RegisterTaskServer(srv.Server(), handlers.New("task"))
 	})
 
 	log.Info("starting task manage")
 
+	defer handlers.Cron.Stop()
 	err := server.Manage.Start(ctx)
 	if err != nil {
 		log.Fatal(err)

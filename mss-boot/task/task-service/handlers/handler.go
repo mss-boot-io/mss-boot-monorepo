@@ -10,17 +10,21 @@ package handlers
 import (
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/pkg/server/handler"
+	"github.com/robfig/cron/v3"
 
 	pb "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/task-proto/v1"
 )
 
+var Cron = cron.New(cron.WithSeconds())
+
 type Handler struct {
 	handler.Handler
-	pb.UnimplementedHelloworldServer
+	pb.UnimplementedTaskServer
 }
 
 // New handler
 func New(id string) *Handler {
+	Cron.Start()
 	return &Handler{
 		Handler: handler.Handler{
 			ID:  id,

@@ -10,6 +10,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,13 +22,22 @@ import (
 func main() {
 	conn, err := grpc.Dial("localhost:9090", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		panic(err)
+		log.Fatalf("could not connect: %s", err.Error())
 	}
-	r, err := pb.NewHelloworldClient(conn).Call(context.TODO(), &pb.CallRequest{
-		Name: "lwx",
-	})
+	br, err := os.ReadFile("test/simple.wasm")
+	if err != nil {
+		log.Fatalf("could not read file: %s", err.Error())
+	}
+	req := &pb.AddTaskRequest{
+		Spec:     "0 * * * * *",
+		FuncType: pb.FuncType_FuncTypeWasm,
+		FuncName: "sum",
+		Content:  br,
+	}
+
+	r, err := pb.NewTaskClient(conn).AddTask(context.TODO(), req)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(r.Message)
+	fmt.Println(r.Id)
 }

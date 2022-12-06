@@ -4,31 +4,57 @@ package proto.v1;
 
 option go_package = "./proto;v1";
 
-service Helloworld {
-  rpc Call(CallRequest) returns (CallResponse) {}
-  rpc Stream(StreamRequest) returns (stream StreamResponse) {}
+service Task {
+  // AddTask add task
+  rpc AddTask(AddTaskRequest) returns (AddTaskResponse) {}
+  // RemoveTask remove task
+  rpc RemoveTask(RemoveTaskRequest) returns (RemoveTaskResponse) {}
+  // GetTask get task
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse) {}
 }
 
-// Return a personalised Hello message
-message CallRequest {
-  // name to append to the message e.g Alice
-  string name = 1;
+enum FuncType {
+  // FuncTypeUnknown unknown
+  FuncTypeUnknown = 0;
+  // FuncTypeWasm wasm
+  FuncTypeWasm = 1;
+  // FuncTypePython2 python2
+  FuncTypePython2 = 2;
+  // FuncTypePython3 python3
+  FuncTypePython3 = 3;
+  // FuncTypeShell shell
+  FuncTypeShell = 4;
+  // FuncTypeJavaScrip javascript
+  FuncTypeJavaScript = 5;
+  // FuncTypeTypeScript typescript
+  FuncTypeTypeScript = 6;
 }
 
-message CallResponse {
-  // message including name e.g Hello Alice
-  string message = 1;
+message AddTaskRequest {
+  string spec = 1;
+  FuncType funcType = 2;
+  string funcName = 3;
+  bytes content = 4;
+  map<string, string> env = 5;
+  string webhook = 6;
 }
 
-// Stream a personalised Hello message
-message StreamRequest {
-  // name to append to the message e.g Alice
-  string name = 1;
-  // the number of messages to send back
-  int64 messages = 2;
+message AddTaskResponse {
+  int64 id = 1;
 }
 
-message StreamResponse {
-  // message including name e.g Hello Alice
-  string message = 1;
+message RemoveTaskRequest {
+  int64 id = 1;
+}
+
+message RemoveTaskResponse {
+  int64 id = 1;
+}
+
+message GetTaskRequest {
+  int64 id = 1;
+}
+
+message GetTaskResponse {
+  int64 id = 1;
 }
