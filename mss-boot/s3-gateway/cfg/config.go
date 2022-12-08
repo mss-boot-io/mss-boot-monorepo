@@ -25,7 +25,7 @@ type Config struct {
 	Server  config.Listen  `yaml:"server" json:"server"`
 	Health  *config.Listen `yaml:"health" json:"health"`
 	Metrics *config.Listen `yaml:"metrics" json:"metrics"`
-	OOS     OOS            `yaml:"oos" json:"oos"`
+	S3      S3Config       `yaml:"s3" json:"s3"`
 }
 
 func (e *Config) Init(handler http.Handler) {
@@ -39,10 +39,10 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	e.Logger.Init()
-	e.OOS.Init()
+	e.S3.Init()
 
 	runnable := []server.Runnable{
-		listener.New("oos-gateway",
+		listener.New("s3-gateway",
 			e.Server.Init(listener.WithHandler(handler))...),
 	}
 	if e.Health != nil {

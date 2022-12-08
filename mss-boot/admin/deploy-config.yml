@@ -13,6 +13,7 @@ config:
   - name: mss-boot-admin-config
     path: /app/cfg
 deploy:
+  image: mssbootio/admin
   stage:
     alpha:
       cluster: matrix-devops

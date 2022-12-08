@@ -15,3 +15,10 @@ logger:
   level: trace
   # 日志格式 json json格式
   formatter: default
+#s3:
+#  provider: oss
+#  signingMethod: v4
+#  region: oss-cn-hongkong
+#  bucket: xxx
+#  accessKeyID: xxx
+#  secretAccessKey: xxx

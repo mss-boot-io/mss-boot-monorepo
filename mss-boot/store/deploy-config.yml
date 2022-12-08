@@ -13,6 +13,7 @@ config:
   - name: mss-boot-store-config
     path: /app/cfg
 deploy:
+  image: mssbootio/store
   stage:
     alpha:
       cluster: matrix-devops

@@ -10,7 +10,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/oos-gateway/cfg"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/s3-gateway/cfg"
 	"io"
 	"net/http"
 
@@ -35,10 +35,10 @@ func (e *OOS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if key == "" {
 		key = "index.html"
 	}
-	client := cfg.Cfg.OOS.GetClient()
+	client := cfg.Cfg.S3.GetClient()
 
 	output, err := client.GetObject(r.Context(), &s3.GetObjectInput{
-		Bucket: &cfg.Cfg.OOS.Bucket,
+		Bucket: &cfg.Cfg.S3.Bucket,
 		Key:    &key,
 	})
 	if err != nil {
@@ -70,21 +70,21 @@ func (e *OOS) Other(r *gin.RouterGroup) {
 // GetObject somebody
 // @Summary Call somebody
 // @Description Call somebody
-// @Tags oos-gateway
+// @Tags s3-gateway
 // @Accept  application/json
 // @Product application/json
 // @Param data body form.HelloworldCallReq true "data"
 // @Success 200 {object} response.Response{data=form.HelloworldCallResp}
-// @Router /oos-gateway/api/v1/call [post]
+// @Router /s3-gateway/api/v1/call [post]
 func (e OOS) GetObject(c *gin.Context) {
 	key := c.Param("key")
 	if key == "" {
 		key = "index.html"
 	}
-	client := cfg.Cfg.OOS.GetClient()
+	client := cfg.Cfg.S3.GetClient()
 
 	output, err := client.GetObject(c, &s3.GetObjectInput{
-		Bucket: &cfg.Cfg.OOS.Bucket,
+		Bucket: &cfg.Cfg.S3.Bucket,
 		Key:    &key,
 	})
 	if err != nil {
