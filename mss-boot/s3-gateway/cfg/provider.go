@@ -10,6 +10,7 @@ package cfg
 import (
 	"context"
 	"fmt"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -22,6 +23,10 @@ const (
 	OOS  ProviderType = "oos"  //ctyun oos
 	KODO ProviderType = "kodo" //qiniu kodo
 	COS  ProviderType = "cos"  //tencent cos
+	OBS  ProviderType = "obs"  //huawei obs
+	BOS  ProviderType = "bos"  //baidu bos
+	GCS  ProviderType = "gcs"  //google gcs fixme:not tested
+	KS3  ProviderType = "ks3"  //kingsoft ks3
 )
 
 var URLTemplate = map[ProviderType]string{
@@ -29,10 +34,14 @@ var URLTemplate = map[ProviderType]string{
 	OOS:  "https://oos-%s.ctyunapi.cn",
 	KODO: "https://s3-%s.qiniucs.com",
 	COS:  "https://cos.%s.myqcloud.com",
+	OBS:  "https://obs.%s.myhuaweicloud.com",
+	BOS:  "https://s3.%s.bcebos.com",
+	GCS:  "https://storage.googleapis.com",
+	KS3:  "https://ks3-%s.ksyuncs.com",
 }
 
 var endpointResolverFunc = func(urlTemplate, signingMethod string) s3.EndpointResolverFunc {
-	return func(region string, _ s3.EndpointResolverOptions) (aws.Endpoint, error) {
+	return func(region string, options s3.EndpointResolverOptions) (aws.Endpoint, error) {
 		return aws.Endpoint{
 			URL:           fmt.Sprintf(urlTemplate, region),
 			SigningRegion: region,
@@ -68,6 +77,8 @@ func (o *ProviderConfig) Init() {
 			}, nil
 		}),
 		EndpointResolver: endpointResolver,
+	}, func(o *s3.Options) {
+		o.EndpointOptions.DisableHTTPS = true
 	})
 }
 

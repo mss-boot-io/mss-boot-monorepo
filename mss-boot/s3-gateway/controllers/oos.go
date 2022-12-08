@@ -10,10 +10,10 @@ package controllers
 import (
 	"bytes"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"io"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/s3-gateway/cfg"
 )
@@ -58,12 +58,26 @@ func (e *OOS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			_, _ = fmt.Fprintln(w, fmt.Sprintf("copy object failed, err:%s", err.Error()))
 			return
 		}
-	case http.MethodPost:
+	case http.MethodPut, http.MethodPost:
 		// put object
 		defer r.Body.Close()
 		h := make([]byte, 512)
 		_, err := io.ReadAtLeast(r.Body, h, 512)
 		if err != nil {
+			if err == io.EOF {
+				output, err := s3.NewPresignClient(client).PresignPutObject(r.Context(), &s3.PutObjectInput{
+					Bucket: &cfg.Cfg.Provider.Bucket,
+					Key:    &key,
+				})
+				if err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					_, _ = fmt.Fprintln(w, fmt.Sprintf("get put object sign url failed, err:%s", err.Error()))
+					return
+				}
+				w.WriteHeader(http.StatusOK)
+				_, _ = w.Write([]byte(output.URL))
+				return
+			}
 			w.WriteHeader(http.StatusInternalServerError)
 			_, _ = fmt.Fprintln(w, fmt.Sprintf("read body(min 512) failed, err:%s", err.Error()))
 			return
