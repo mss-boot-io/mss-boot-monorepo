@@ -10,8 +10,6 @@ package cfg
 import (
 	"context"
 	"fmt"
-	"log"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
@@ -19,17 +17,18 @@ import (
 type S3Provider string
 
 const (
-	S3   S3Provider = "s3"
-	OSS  S3Provider = "oss"
-	OOS  S3Provider = "oos"
-	KODO S3Provider = "kodo"
+	S3   S3Provider = "s3"   //aws s3
+	OSS  S3Provider = "oss"  //aliyun oss
+	OOS  S3Provider = "oos"  //ctyun oos
+	KODO S3Provider = "kodo" //qiniu kodo
+	COS  S3Provider = "cos"  //tencent cos
 )
 
 var URLTemplate = map[S3Provider]string{
-	S3:   "https://%s.amazonaws.com",   //aws s3
-	OSS:  "https://%s.aliyuncs.com",    //aliyun oss
-	OOS:  "https://oos-%s.ctyunapi.cn", //ctyun oos
-	KODO: "https://%s.qiniucs.com",     //qiniu kodo
+	OSS:  "https://%s.aliyuncs.com",
+	OOS:  "https://oos-%s.ctyunapi.cn",
+	KODO: "https://s3-%s.qiniucs.com",
+	COS:  "https://cos.%s.myqcloud.com",
 }
 
 var endpointResolverFunc = func(urlTemplate, signingMethod string) s3.EndpointResolverFunc {
@@ -54,12 +53,11 @@ type S3Config struct {
 
 // Init init
 func (o *S3Config) Init() {
-	urlTemplate, exist := URLTemplate[o.Provider]
-	if o.SigningMethod == "" {
-		o.SigningMethod = "v4"
-	}
-	if !exist || urlTemplate == "" {
-		log.Fatalf("s3 provider %s not support", o.Provider)
+	var endpointResolver s3.EndpointResolver
+	if o.Provider != S3 {
+		if urlTemplate, exist := URLTemplate[o.Provider]; exist && urlTemplate != "" {
+			endpointResolver = endpointResolverFunc(urlTemplate, o.SigningMethod)
+		}
 	}
 	o.client = s3.New(s3.Options{
 		Region: o.Region,
@@ -69,7 +67,7 @@ func (o *S3Config) Init() {
 				SecretAccessKey: o.SecretAccessKey,
 			}, nil
 		}),
-		EndpointResolver: endpointResolverFunc(urlTemplate, o.SigningMethod),
+		EndpointResolver: endpointResolver,
 	})
 }
 
