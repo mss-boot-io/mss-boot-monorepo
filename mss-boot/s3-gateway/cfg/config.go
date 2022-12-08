@@ -21,11 +21,11 @@ var Cfg Config
 
 // Config 配置
 type Config struct {
-	Logger  config.Logger  `yaml:"logger" json:"logger"`
-	Server  config.Listen  `yaml:"server" json:"server"`
-	Health  *config.Listen `yaml:"health" json:"health"`
-	Metrics *config.Listen `yaml:"metrics" json:"metrics"`
-	S3      S3Config       `yaml:"s3" json:"s3"`
+	Logger   config.Logger  `yaml:"logger" json:"logger"`
+	Server   config.Listen  `yaml:"server" json:"server"`
+	Health   *config.Listen `yaml:"health" json:"health"`
+	Metrics  *config.Listen `yaml:"metrics" json:"metrics"`
+	Provider ProviderConfig `yaml:"provider" json:"provider"`
 }
 
 func (e *Config) Init(handler http.Handler) {
@@ -39,7 +39,7 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	e.Logger.Init()
-	e.S3.Init()
+	e.Provider.Init()
 
 	runnable := []server.Runnable{
 		listener.New("s3-gateway",

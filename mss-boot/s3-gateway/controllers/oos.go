@@ -8,24 +8,23 @@
 package controllers
 
 import (
+	"bytes"
 	"fmt"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/s3-gateway/cfg"
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"io"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/mss-boot-io/mss-boot/pkg/response"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/s3-gateway/cfg"
 )
 
-func init() {
-	e := &OOS{}
-	//e.Auth = false
-	response.AppendController(e)
-}
+//func init() {
+//	e := &OOS{}
+//	//e.Auth = false
+//	response.AppendController(e)
+//}
 
 type OOS struct {
-	response.Api
 	//curd.DefaultController
 }
 
@@ -35,61 +34,70 @@ func (e *OOS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if key == "" {
 		key = "index.html"
 	}
-	client := cfg.Cfg.S3.GetClient()
+	client := cfg.Cfg.Provider.GetClient()
 
-	output, err := client.GetObject(r.Context(), &s3.GetObjectInput{
-		Bucket: &cfg.Cfg.S3.Bucket,
-		Key:    &key,
-	})
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprintln(w, fmt.Sprintf("get object failed, err:%s", err.Error()))
-		return
+	switch r.Method {
+	case http.MethodGet:
+		// get object
+		output, err := client.GetObject(r.Context(), &s3.GetObjectInput{
+			Bucket: &cfg.Cfg.Provider.Bucket,
+			Key:    &key,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, fmt.Sprintf("get object failed, err:%s", err.Error()))
+			return
+		}
+		defer output.Body.Close()
+		w.Header().Set("Content-Type", *output.ContentType)
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", output.ContentLength))
+
+		_, err = io.Copy(w, output.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, fmt.Sprintf("copy object failed, err:%s", err.Error()))
+			return
+		}
+	case http.MethodPost:
+		// put object
+		defer r.Body.Close()
+		h := make([]byte, 512)
+		_, err := io.ReadAtLeast(r.Body, h, 512)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, fmt.Sprintf("read body(min 512) failed, err:%s", err.Error()))
+			return
+		}
+		contentType := http.DetectContentType(h)
+		buffer := bytes.NewBuffer(h)
+		_, err = buffer.ReadFrom(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, fmt.Sprintf("read body failed, err:%s", err.Error()))
+			return
+		}
+		_, err = client.PutObject(r.Context(), &s3.PutObjectInput{
+			Bucket:      &cfg.Cfg.Provider.Bucket,
+			Key:         &key,
+			Body:        buffer,
+			ContentType: aws.String(contentType),
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, fmt.Sprintf("read body failed, err:%s", err.Error()))
+			return
+		}
+	case http.MethodDelete:
+		// delete object
+		_, err := client.DeleteObject(r.Context(), &s3.DeleteObjectInput{
+			Bucket: &cfg.Cfg.Provider.Bucket,
+			Key:    &key,
+		})
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = fmt.Fprintln(w, fmt.Sprintf("delete object failed, err:%s", err.Error()))
+			return
+		}
 	}
-	defer output.Body.Close()
-	w.Header().Set("Content-Type", *output.ContentType)
-	w.Header().Set("Content-Length", fmt.Sprintf("%d", output.ContentLength))
-
-	_, err = io.Copy(w, output.Body)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		_, _ = fmt.Fprintln(w, fmt.Sprintf("copy object failed, err:%s", err.Error()))
-		return
-	}
-}
-
-func (*OOS) Path() string {
-	return "/"
-}
-
-func (e *OOS) Other(r *gin.RouterGroup) {
-	//r.Use((&middlewares.AuthMiddleware{}).AuthMiddleware())
-	r.GET("/:key", e.GetObject)
-}
-
-// GetObject somebody
-// @Summary Call somebody
-// @Description Call somebody
-// @Tags s3-gateway
-// @Accept  application/json
-// @Product application/json
-// @Param data body form.HelloworldCallReq true "data"
-// @Success 200 {object} response.Response{data=form.HelloworldCallResp}
-// @Router /s3-gateway/api/v1/call [post]
-func (e OOS) GetObject(c *gin.Context) {
-	key := c.Param("key")
-	if key == "" {
-		key = "index.html"
-	}
-	client := cfg.Cfg.S3.GetClient()
-
-	output, err := client.GetObject(c, &s3.GetObjectInput{
-		Bucket: &cfg.Cfg.S3.Bucket,
-		Key:    &key,
-	})
-	if err != nil {
-		c.Data(http.StatusInternalServerError, "text/plain", []byte(fmt.Sprintf("get object failed, err:%v", err)))
-		return
-	}
-	c.DataFromReader(http.StatusOK, output.ContentLength, *output.ContentType, output.Body, nil)
+	w.WriteHeader(http.StatusOK)
 }

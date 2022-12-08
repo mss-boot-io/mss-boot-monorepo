@@ -14,17 +14,17 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 )
 
-type S3Provider string
+type ProviderType string
 
 const (
-	S3   S3Provider = "s3"   //aws s3
-	OSS  S3Provider = "oss"  //aliyun oss
-	OOS  S3Provider = "oos"  //ctyun oos
-	KODO S3Provider = "kodo" //qiniu kodo
-	COS  S3Provider = "cos"  //tencent cos
+	S3   ProviderType = "s3"   //aws s3
+	OSS  ProviderType = "oss"  //aliyun oss
+	OOS  ProviderType = "oos"  //ctyun oos
+	KODO ProviderType = "kodo" //qiniu kodo
+	COS  ProviderType = "cos"  //tencent cos
 )
 
-var URLTemplate = map[S3Provider]string{
+var URLTemplate = map[ProviderType]string{
 	OSS:  "https://%s.aliyuncs.com",
 	OOS:  "https://oos-%s.ctyunapi.cn",
 	KODO: "https://s3-%s.qiniucs.com",
@@ -41,21 +41,21 @@ var endpointResolverFunc = func(urlTemplate, signingMethod string) s3.EndpointRe
 	}
 }
 
-type S3Config struct {
-	Provider        S3Provider `yaml:"provider"`
-	SigningMethod   string     `yaml:"signingMethod"`
-	Region          string     `yaml:"region"`
-	Bucket          string     `yaml:"bucket"`
-	AccessKeyID     string     `yaml:"accessKeyID"`
-	SecretAccessKey string     `yaml:"secretAccessKey"`
+type ProviderConfig struct {
+	Type            ProviderType `yaml:"type"`
+	SigningMethod   string       `yaml:"signingMethod"`
+	Region          string       `yaml:"region"`
+	Bucket          string       `yaml:"bucket"`
+	AccessKeyID     string       `yaml:"accessKeyID"`
+	SecretAccessKey string       `yaml:"secretAccessKey"`
 	client          *s3.Client
 }
 
 // Init init
-func (o *S3Config) Init() {
+func (o *ProviderConfig) Init() {
 	var endpointResolver s3.EndpointResolver
-	if o.Provider != S3 {
-		if urlTemplate, exist := URLTemplate[o.Provider]; exist && urlTemplate != "" {
+	if o.Type != S3 {
+		if urlTemplate, exist := URLTemplate[o.Type]; exist && urlTemplate != "" {
 			endpointResolver = endpointResolverFunc(urlTemplate, o.SigningMethod)
 		}
 	}
@@ -72,6 +72,6 @@ func (o *S3Config) Init() {
 }
 
 // GetClient get client
-func (o *S3Config) GetClient() *s3.Client {
+func (o *ProviderConfig) GetClient() *s3.Client {
 	return o.client
 }
