@@ -13,6 +13,7 @@ config:
   - name: mss-boot-generator-config
     path: /app/cfg
 deploy:
+  image: mssbootio/generator
   stage:
     alpha:
       cluster: matrix-devops
