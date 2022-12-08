@@ -17,7 +17,7 @@ import (
 
 var endpointResolverFunc = func(region string, _ s3.EndpointResolverOptions) (aws.Endpoint, error) {
 	return aws.Endpoint{
-		URL:           fmt.Sprintf("https://oos-%s.ctyunapi.cn", region),
+		URL:           fmt.Sprintf("https://%s.aliyuncs.com", region),
 		SigningRegion: region,
 		SigningMethod: "v4",
 	}, nil

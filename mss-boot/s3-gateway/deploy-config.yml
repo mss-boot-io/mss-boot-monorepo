@@ -1,5 +1,5 @@
 project: mss-boot
-service: oos-gateway
+service: s3-gateway
 ports:
   - port: 8080
     targetPort: 8080
@@ -10,10 +10,10 @@ metrics:
   path: /metrics
 hpa: false
 config:
-  - name: mss-boot-oos-gateway-config
+  - name: mss-boot-s3-gateway-config
     path: /app/cfg
 deploy:
-  image: mssbootio/oos-gateway
+  image: mssbootio/s3-gateway
   stage:
     alpha:
       cluster: matrix-devops

@@ -20,4 +20,4 @@ cfg/*-*.yaml
 
 temp/
 
-oos-gateway
+s3-gateway
