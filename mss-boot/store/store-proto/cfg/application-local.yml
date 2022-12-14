@@ -1,0 +1,3 @@
+client:
+  address: localhost:9090
+  timeout: 10s

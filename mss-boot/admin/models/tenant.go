@@ -11,10 +11,16 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mss-boot-io/mss-boot/client"
-	pb "github.com/mss-boot-io/mss-boot/proto/store/v1"
 	"time"
 
+	store_proto "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto"
+	pb "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/v1"
+	storePB "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/v1"
+	log "github.com/mss-boot-io/mss-boot/core/logger"
+	"github.com/mss-boot-io/mss-boot/pkg/config"
+	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
+	"github.com/mss-boot-io/mss-boot/pkg/enum"
+	"github.com/mss-boot-io/mss-boot/pkg/store"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,11 +28,6 @@ import (
 	"go.mongodb.org/mongo-driver/x/bsonx"
 
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
-	log "github.com/mss-boot-io/mss-boot/core/logger"
-	"github.com/mss-boot-io/mss-boot/pkg/config"
-	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
-	"github.com/mss-boot-io/mss-boot/pkg/enum"
-	"github.com/mss-boot-io/mss-boot/pkg/store"
 )
 
 func init() {
@@ -111,7 +112,7 @@ func (e *Tenant) C() *mongo.Collection {
 // GetClientByDomain 获取租户的client
 func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAuth2Configure, error) {
 	if e.storeClient == nil {
-		e.storeClient = client.Store().GetClient()
+		e.storeClient = store_proto.GetClient()
 	}
 	resp, err := e.storeClient.Get(c, &pb.GetReq{Key: fmt.Sprintf("tenant_%s", domain)})
 	if err != nil {
@@ -128,7 +129,7 @@ func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAut
 // GetTenantByDomain 获取租户
 func (e *Tenant) GetTenantByDomain(c context.Context, domain string) error {
 	if e.storeClient == nil {
-		e.storeClient = client.Store().GetClient()
+		e.storeClient = store_proto.GetClient()
 	}
 	resp, err := e.storeClient.Get(c, &pb.GetReq{Key: fmt.Sprintf("tenant_%s", domain)})
 	if err != nil {
@@ -139,8 +140,8 @@ func (e *Tenant) GetTenantByDomain(c context.Context, domain string) error {
 }
 
 func (e *Tenant) InitStore() {
-	//todo 初始化所有租户到store
-	c := client.Store().GetClient()
+	//初始化所有租户到store
+	c := store_proto.GetClient()
 
 	cur, err := e.C().Find(context.TODO(), bson.M{})
 	if err != nil {
@@ -159,7 +160,7 @@ func (e *Tenant) InitStore() {
 			log.Fatal(err)
 		}
 		for _, domain := range tenant.Domains {
-			_, err = c.Set(ctx, &pb.SetReq{
+			_, err = c.Set(ctx, &storePB.SetReq{
 				Key:   fmt.Sprintf("tenant_%s", domain),
 				Value: string(rb),
 			})
