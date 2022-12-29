@@ -18,6 +18,7 @@ logger:
 database:
   url: ''
   name: mss_boot_admin
+  casbin: true
   timeout: 10s
 # 修改为部署的oauth2服务的配置
 oauth2:

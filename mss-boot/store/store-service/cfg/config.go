@@ -36,14 +36,14 @@ func (e *Config) Init(handler func(srv *grpc.Server)) {
 	case source.FS:
 		opts = append(opts, source.WithProvider(source.FS),
 			source.WithFrom(cfg.FS))
-	case source.Local:
-		opts = append(opts, source.WithProvider(source.Local),
-			source.WithDir("cfg"))
 	case source.S3:
 		_, pwd, _, _ := runtime.Caller(1)
 		opts = append(opts, source.WithProvider(source.S3),
 			source.WithDir(filepath.Dir(pwd)),
 			source.WithProjectName("mss-boot"))
+	default:
+		opts = append(opts, source.WithProvider(source.Local),
+			source.WithDir("cfg"))
 	}
 	err := config.Init(e, opts...)
 	if err != nil {

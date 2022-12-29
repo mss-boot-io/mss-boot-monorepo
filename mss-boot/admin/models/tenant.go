@@ -11,6 +11,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/kamva/mgm/v3"
 	"time"
 
 	store_proto "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto"
@@ -22,7 +23,6 @@ import (
 	"github.com/mss-boot-io/mss-boot/pkg/enum"
 	"github.com/mss-boot-io/mss-boot/pkg/store"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/x/bsonx"
@@ -37,19 +37,17 @@ func init() {
 
 // Tenant 租户
 type Tenant struct {
-	ID          string         `json:"id" bson:"_id"`
-	Name        string         `json:"name" bson:"name"`
-	Contact     string         `json:"contact" bson:"contact"`
-	System      bool           `json:"system" bson:"system"`
-	Status      enum.Status    `json:"status" bson:"status"`
-	Description string         `json:"description" bson:"description"`
-	Domains     []string       `json:"domains" bson:"domains"`
-	Client      config.OAuth2  `json:"client" bson:"client"`
-	Metadata    interface{}    `json:"metadata" bson:"metadata"`
-	ExpiredAt   time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
-	CreatedAt   time.Time      `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt" bson:"updatedAt"`
-	storeClient pb.StoreClient `bson:"-"`
+	mgm.DefaultModel `bson:",inline"`
+	Name             string         `json:"name" bson:"name"`
+	Contact          string         `json:"contact" bson:"contact"`
+	System           bool           `json:"system" bson:"system"`
+	Status           enum.Status    `json:"status" bson:"status"`
+	Description      string         `json:"description" bson:"description"`
+	Domains          []string       `json:"domains" bson:"domains"`
+	Client           config.OAuth2  `json:"client" bson:"client"`
+	Metadata         interface{}    `json:"metadata" bson:"metadata"`
+	ExpiredAt        time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
+	storeClient      pb.StoreClient `bson:"-"`
 }
 type OnlyClient struct {
 	ID     string        `json:"id" bson:"_id"`
@@ -83,7 +81,6 @@ func (e *Tenant) Make() {
 	if count == 0 {
 		now := time.Now()
 		e.C().InsertOne(context.TODO(), Tenant{
-			ID:          primitive.NewObjectID().Hex(),
 			Name:        "mss-boot-io",
 			Contact:     "mss-boot-io",
 			System:      true,
@@ -98,8 +95,12 @@ func (e *Tenant) Make() {
 				RedirectURL:  cfg.Cfg.OAuth2.RedirectURL,
 			},
 			ExpiredAt: now.Add(time.Hour * 24 * 365 * 100),
-			CreatedAt: now,
-			UpdatedAt: now,
+			DefaultModel: mgm.DefaultModel{
+				DateFields: mgm.DateFields{
+					CreatedAt: now,
+					UpdatedAt: now,
+				},
+			},
 		})
 		return
 	}

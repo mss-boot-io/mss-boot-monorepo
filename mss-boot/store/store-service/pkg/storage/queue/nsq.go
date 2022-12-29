@@ -36,7 +36,7 @@ type NSQ struct {
 }
 
 // String 字符串类型
-func (NSQ) String() string {
+func (*NSQ) String() string {
 	return "nsq"
 }
 

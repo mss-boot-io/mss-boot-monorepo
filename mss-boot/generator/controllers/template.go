@@ -328,5 +328,5 @@ func getGithubConfig(c *gin.Context) (g *models.Github, err error) {
 		return nil, err
 	}
 	//todo 需要改成各人的
-	return models.GetMyGithubConfig(c, t.ID, "lwnmengjing@qq.com")
+	return models.GetMyGithubConfig(c, t.ID.Hex(), "lwnmengjing@qq.com")
 }

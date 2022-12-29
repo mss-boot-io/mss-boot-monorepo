@@ -13,6 +13,9 @@ service Store {
   rpc Increase(IncreaseReq) returns (IncreaseResp) {};
   rpc Decrease(DecreaseReq) returns (DecreaseResp) {};
   rpc Expire(ExpireReq) returns (ExpireResp) {};
+  //queue
+  rpc Append(AppendReq) returns (AppendResp) {};
+  rpc Register(RegisterReq) returns (stream RegisterResp) {};
 }
 
 message GetReq {
@@ -71,3 +74,25 @@ message DecreaseReq {
 }
 
 message DecreaseResp {}
+
+message AppendReq {
+  string id = 1;
+  string stream = 2;
+  string prefix = 3;
+  // values map[string]interface{]
+  bytes values = 4;
+}
+
+message AppendResp {}
+
+message RegisterReq {
+  string stream = 2;
+}
+
+message RegisterResp {
+  string id = 1;
+  string stream = 2;
+  string prefix = 3;
+  // values map[string]interface{]
+  bytes values = 4;
+}

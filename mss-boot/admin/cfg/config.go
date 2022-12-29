@@ -8,6 +8,7 @@
 package cfg
 
 import (
+	"embed"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,11 +20,13 @@ import (
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/config/source"
-
-	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/cfg"
 )
 
-var Cfg Config
+var (
+	//go:embed *.yml
+	FS  embed.FS
+	Cfg Config
+)
 
 // Config 配置
 type Config struct {
@@ -40,7 +43,7 @@ func (e *Config) Init(handler http.Handler) {
 	switch source.Provider(os.Getenv("config_source")) {
 	case source.FS:
 		opts = append(opts, source.WithProvider(source.FS),
-			source.WithFrom(cfg.FS))
+			source.WithFrom(FS))
 	case source.Local:
 		opts = append(opts, source.WithProvider(source.Local),
 			source.WithDir("cfg"))

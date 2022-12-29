@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/coreos/go-oidc/v3/oidc"
+	"github.com/kamva/mgm/v3"
 	"github.com/mss-boot-io/mss-boot/pkg/enum"
 	"github.com/mss-boot-io/mss-boot/pkg/middlewares"
 	"go.mongodb.org/mongo-driver/bson"
@@ -27,19 +28,17 @@ import (
 )
 
 type User struct {
-	ID        string      `bson:"_id" json:"id"`
-	Subject   string      `bson:"subject" json:"subject"`
-	TenantID  string      `bson:"tenantID" json:"tenantID"`
-	Username  string      `bson:"username" json:"username"`
-	Nickname  string      `bson:"nickname" json:"nickname"`
-	Avatar    string      `bson:"avatar" json:"avatar"`
-	Email     string      `bson:"email" json:"email"`
-	Phone     string      `bson:"phone" json:"phone"`
-	Status    enum.Status `bson:"status" json:"status"`
-	PWD       UserPwd     `bson:"pwd" json:"pwd"`
-	Metadata  interface{} `bson:"metadata" json:"metadata"`
-	CreatedAt time.Time   `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time   `json:"updatedAt" bson:"updatedAt"`
+	mgm.DefaultModel `bson:",inline"`
+	Subject          string      `bson:"subject" json:"subject"`
+	TenantID         string      `bson:"tenantID" json:"tenantID"`
+	Username         string      `bson:"username" json:"username"`
+	Nickname         string      `bson:"nickname" json:"nickname"`
+	Avatar           string      `bson:"avatar" json:"avatar"`
+	Email            string      `bson:"email" json:"email"`
+	Phone            string      `bson:"phone" json:"phone"`
+	Status           enum.Status `bson:"status" json:"status"`
+	PWD              UserPwd     `bson:"pwd" json:"pwd"`
+	Metadata         interface{} `bson:"metadata" json:"metadata"`
 }
 
 type UserPwd struct {
@@ -103,15 +102,19 @@ func CreateOrUpdateUser(ctx context.Context, domain string, idToken *oidc.IDToke
 	//todo set usernamePostfix
 	usernamePostfix := ""
 	user := &User{
-		TenantID:  tenant.ID,
-		Subject:   claims.Subject,
-		Username:  claims.Name + usernamePostfix,
-		Nickname:  claims.Name + usernamePostfix,
-		Avatar:    claims.Audience,
-		Email:     claims.Email,
-		Status:    enum.Enabled,
-		Metadata:  *claims,
-		CreatedAt: time.Now(),
+		TenantID: tenant.ID.Hex(),
+		Subject:  claims.Subject,
+		Username: claims.Name + usernamePostfix,
+		Nickname: claims.Name + usernamePostfix,
+		Avatar:   claims.Audience,
+		Email:    claims.Email,
+		Status:   enum.Enabled,
+		Metadata: *claims,
+		DefaultModel: mgm.DefaultModel{
+			DateFields: mgm.DateFields{
+				CreatedAt: time.Now(),
+			},
+		},
 	}
 	var count int64
 	count, err = user.C().CountDocuments(ctx, bson.M{"username": user.Username, "tenantID": user.TenantID})
@@ -129,7 +132,7 @@ func CreateOrUpdateUser(ctx context.Context, domain string, idToken *oidc.IDToke
 		return nil
 	}
 	user.UpdatedAt = user.CreatedAt
-	user.ID = primitive.NewObjectID().Hex()
+	user.ID = primitive.NewObjectID()
 	_, err = user.C().InsertOne(ctx, user)
 	return err
 }
