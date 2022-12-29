@@ -75,7 +75,7 @@ func (e Github) CreatOrUpdate(c *gin.Context) {
 	now := time.Now()
 	g := &models.Github{
 		ID:        primitive.NewObjectID().Hex(),
-		TenantID:  t.ID,
+		TenantID:  t.ID.Hex(),
 		Email:     user.Email,
 		Password:  req.Password,
 		CreatedAt: now,
@@ -112,7 +112,7 @@ func (e Github) Get(c *gin.Context) {
 		e.Err(http.StatusUnauthorized, err)
 		return
 	}
-	g, err1 := models.GetMyGithubConfig(c, t.ID, user.Email)
+	g, err1 := models.GetMyGithubConfig(c, t.ID.Hex(), user.Email)
 	result := &form.GithubGetResp{
 		Email:     user.Email,
 		CreatedAt: g.CreatedAt,

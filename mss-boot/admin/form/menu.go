@@ -15,37 +15,26 @@ import (
 )
 
 type MenuCreateReq struct {
-
 	//租户id
 	TenantID string `bson:"tenantID" json:"tenantID" binding:"required"`
-
 	//名称
 	Name string `bson:"name" json:"name" binding:"required"`
-
 	//icon
 	Icon string `bson:"icon" json:"icon" `
-
 	//路径
 	Path string `bson:"path" json:"path" binding:"required"`
-
 	//权限
 	Access string `bson:"access" json:"access" binding:"required"`
-
 	//状态
 	Status enum.Status `bson:"status" json:"status" `
-
 	//父菜单
 	ParentKeys []string `bson:"parentKeys" json:"parentKeys" `
-
 	//重定向
 	Redirect string `bson:"redirect" json:"redirect" `
-
 	//Layout
 	Layout bool `bson:"layout" json:"layout" `
-
 	//组件
 	Component string `bson:"component" json:"component" `
-
 	//创建时间
 	CreatedAt time.Time `json:"-" bson:"createdAt"`
 	//更新时间

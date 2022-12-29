@@ -9,8 +9,7 @@ package models
 
 import (
 	"context"
-	"time"
-
+	"github.com/kamva/mgm/v3"
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/enum"
@@ -24,13 +23,11 @@ func init() {
 }
 
 type Role struct {
-	ID        string      `bson:"_id" json:"id"`
-	TenantID  string      `bson:"tenantID" json:"tenantID"`
-	Name      string      `bson:"name" json:"name"`
-	Status    enum.Status `bson:"status" json:"status"`
-	Metadata  interface{} `bson:"metadata" json:"metadata"`
-	CreatedAt time.Time   `bson:"createdAt" json:"createdAt"`
-	UpdatedAt time.Time   `bson:"updatedAt" json:"updatedAt"`
+	mgm.DefaultModel `bson:",inline"`
+	TenantID         string      `bson:"tenantID" json:"tenantID"`
+	Name             string      `bson:"name" json:"name"`
+	Status           enum.Status `bson:"status" json:"status"`
+	Metadata         interface{} `bson:"metadata" json:"metadata"`
 }
 
 func (Role) TableName() string {

@@ -9,10 +9,10 @@ package models
 
 import (
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
 
+	"github.com/kamva/mgm/v3"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/x/bsonx"
 
@@ -28,21 +28,19 @@ func init() {
 
 // Menu <no value>
 type Menu struct {
-	ID         string      `bson:"_id" json:"id"`
-	TenantID   string      `bson:"tenantID" json:"tenantID"`
-	Name       string      `bson:"name" json:"name"`
-	Icon       string      `bson:"icon" json:"icon"`
-	Path       string      `bson:"path" json:"path"`
-	Access     string      `bson:"access" json:"access"`
-	HideInMenu bool        `bson:"hideInMenu" json:"hideInMenu"`
-	Status     enum.Status `bson:"status" json:"status"`
-	Routes     []Menu      `bson:"routes" json:"routes"`
-	ParentKeys []string    `bson:"parentKeys" json:"parentKeys"`
-	Redirect   string      `bson:"redirect" json:"redirect"`
-	Layout     bool        `bson:"layout" json:"layout"`
-	Component  string      `bson:"component" json:"component"`
-	CreatedAt  time.Time   `json:"createdAt" bson:"createdAt"`
-	UpdatedAt  time.Time   `json:"updatedAt" bson:"updatedAt"`
+	mgm.DefaultModel `bson:",inline"`
+	TenantID         string      `bson:"tenantID" json:"tenantID"`
+	Name             string      `bson:"name" json:"name"`
+	Icon             string      `bson:"icon" json:"icon"`
+	Path             string      `bson:"path" json:"path"`
+	Access           string      `bson:"access" json:"access"`
+	HideInMenu       bool        `bson:"hideInMenu" json:"hideInMenu"`
+	Status           enum.Status `bson:"status" json:"status"`
+	Routes           []Menu      `bson:"routes" json:"routes"`
+	ParentKeys       []string    `bson:"parentKeys" json:"parentKeys"`
+	Redirect         string      `bson:"redirect" json:"redirect"`
+	Layout           bool        `bson:"layout" json:"layout"`
+	Component        string      `bson:"component" json:"component"`
 }
 
 func (Menu) TableName() string {
@@ -72,7 +70,6 @@ func (e *Menu) Make() {
 		now := time.Now()
 		e.C().InsertMany(context.TODO(), []interface{}{
 			&Menu{
-				ID:     primitive.NewObjectID().Hex(),
 				Path:   "/user",
 				Layout: false,
 				Routes: []Menu{
@@ -90,26 +87,36 @@ func (e *Menu) Make() {
 						Component: "./404",
 					},
 				},
-				CreatedAt: now,
-				UpdatedAt: now,
+				DefaultModel: mgm.DefaultModel{
+					DateFields: mgm.DateFields{
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+				},
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().Hex(),
-				Name:      "welcome",
-				Path:      "/welcome",
-				Status:    enum.Enabled,
-				Layout:    true,
-				CreatedAt: now,
-				UpdatedAt: now,
+				Name:   "welcome",
+				Path:   "/welcome",
+				Status: enum.Enabled,
+				Layout: true,
+				DefaultModel: mgm.DefaultModel{
+					DateFields: mgm.DateFields{
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+				},
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().Hex(),
-				Name:      "menu",
-				Path:      "/menu/list",
-				Status:    enum.Enabled,
-				Layout:    true,
-				CreatedAt: now,
-				UpdatedAt: now,
+				Name:   "menu",
+				Path:   "/menu/list",
+				Status: enum.Enabled,
+				Layout: true,
+				DefaultModel: mgm.DefaultModel{
+					DateFields: mgm.DateFields{
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+				},
 				Routes: []Menu{
 					{
 						Name:       "",
@@ -134,25 +141,34 @@ func (e *Menu) Make() {
 				},
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().Hex(),
-				Path:      "/",
-				Redirect:  "/welcome",
-				CreatedAt: now,
-				UpdatedAt: now,
+				Path:     "/",
+				Redirect: "/welcome",
+				DefaultModel: mgm.DefaultModel{
+					DateFields: mgm.DateFields{
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+				},
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().Hex(),
 				Component: "./404",
-				CreatedAt: now,
-				UpdatedAt: now,
+				DefaultModel: mgm.DefaultModel{
+					DateFields: mgm.DateFields{
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+				},
 			},
 			&Menu{
-				ID:        primitive.NewObjectID().Hex(),
-				Name:      "generate",
-				Path:      "/generate",
-				Layout:    true,
-				CreatedAt: now,
-				UpdatedAt: now,
+				Name:   "generate",
+				Path:   "/generate",
+				Layout: true,
+				DefaultModel: mgm.DefaultModel{
+					DateFields: mgm.DateFields{
+						CreatedAt: now,
+						UpdatedAt: now,
+					},
+				},
 			},
 		})
 	}

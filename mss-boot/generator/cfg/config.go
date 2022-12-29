@@ -9,17 +9,21 @@ package cfg
 
 import (
 	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
 
-	"github.com/mss-boot-io/mss-boot/client"
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/core/server"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
-	"github.com/mss-boot-io/mss-boot/pkg/config/source/local"
+	"github.com/mss-boot-io/mss-boot/pkg/config/source"
 	"github.com/mss-boot-io/mss-boot/pkg/store"
 
 	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/models"
+	storePB "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto"
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/cfg"
 )
 
 var Cfg Config
@@ -32,15 +36,24 @@ type Config struct {
 	Metrics  *config.Listen   `yaml:"metrics" json:"metrics"`
 	Database mongodb.Database `yaml:"database" json:"database"`
 	Github   Github           `yaml:"github" json:"github"`
-	Clients  config.Clients   `yaml:"clients" json:"clients"`
 }
 
 func (e *Config) Init(handler http.Handler) {
-	frs, err := local.New(local.WithDir("cfg"))
-	if err != nil {
-		log.Fatalf("cfg init failed, %s\n", err.Error())
+	opts := make([]source.Option, 0)
+	switch source.Provider(os.Getenv("config_source")) {
+	case source.FS:
+		opts = append(opts, source.WithProvider(source.FS),
+			source.WithFrom(cfg.FS))
+	case source.Local:
+		opts = append(opts, source.WithProvider(source.Local),
+			source.WithDir("cfg"))
+	case source.S3:
+		_, pwd, _, _ := runtime.Caller(1)
+		opts = append(opts, source.WithProvider(source.S3),
+			source.WithDir(filepath.Dir(pwd)),
+			source.WithProjectName("mss-boot"))
 	}
-	err = config.Init(frs, &Cfg)
+	err := config.Init(e, opts...)
 	if err != nil {
 		log.Fatalf("cfg init failed, %s\n", err.Error())
 	}
@@ -48,14 +61,7 @@ func (e *Config) Init(handler http.Handler) {
 	e.Logger.Init()
 	e.Database.Init()
 
-	if len(e.Clients) > 0 {
-		err = e.Clients.Init()
-		if err != nil {
-			log.Fatalf("cfg(clients) init failed, %s\n", err.Error())
-		}
-	}
-
-	store.DefaultOAuth2Store = models.NewTenant(client.Store().GetClient())
+	store.DefaultOAuth2Store = models.NewTenant(storePB.GetClient())
 
 	runnable := []server.Runnable{
 		listener.New("generator",

@@ -11,22 +11,23 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/mss-boot-io/mss-boot/client"
-	pb "github.com/mss-boot-io/mss-boot/proto/store/v1"
+	"github.com/kamva/mgm/v3"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
-
-	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
+	store_proto "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto"
+	pb "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/v1"
+	storePB "github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/v1"
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
 	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/enum"
 	"github.com/mss-boot-io/mss-boot/pkg/store"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/bsonx"
+
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin/cfg"
 )
 
 func init() {
@@ -36,19 +37,17 @@ func init() {
 
 // Tenant 租户
 type Tenant struct {
-	ID          string         `json:"id" bson:"_id"`
-	Name        string         `json:"name" bson:"name"`
-	Contact     string         `json:"contact" bson:"contact"`
-	System      bool           `json:"system" bson:"system"`
-	Status      enum.Status    `json:"status" bson:"status"`
-	Description string         `json:"description" bson:"description"`
-	Domains     []string       `json:"domains" bson:"domains"`
-	Client      config.OAuth2  `json:"client" bson:"client"`
-	Metadata    interface{}    `json:"metadata" bson:"metadata"`
-	ExpiredAt   time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
-	CreatedAt   time.Time      `json:"createdAt" bson:"createdAt"`
-	UpdatedAt   time.Time      `json:"updatedAt" bson:"updatedAt"`
-	storeClient pb.StoreClient `bson:"-"`
+	mgm.DefaultModel `bson:",inline"`
+	Name             string         `json:"name" bson:"name"`
+	Contact          string         `json:"contact" bson:"contact"`
+	System           bool           `json:"system" bson:"system"`
+	Status           enum.Status    `json:"status" bson:"status"`
+	Description      string         `json:"description" bson:"description"`
+	Domains          []string       `json:"domains" bson:"domains"`
+	Client           config.OAuth2  `json:"client" bson:"client"`
+	Metadata         interface{}    `json:"metadata" bson:"metadata"`
+	ExpiredAt        time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
+	storeClient      pb.StoreClient `bson:"-"`
 }
 type OnlyClient struct {
 	ID     string        `json:"id" bson:"_id"`
@@ -82,7 +81,6 @@ func (e *Tenant) Make() {
 	if count == 0 {
 		now := time.Now()
 		e.C().InsertOne(context.TODO(), Tenant{
-			ID:          primitive.NewObjectID().Hex(),
 			Name:        "mss-boot-io",
 			Contact:     "mss-boot-io",
 			System:      true,
@@ -97,8 +95,12 @@ func (e *Tenant) Make() {
 				RedirectURL:  cfg.Cfg.OAuth2.RedirectURL,
 			},
 			ExpiredAt: now.Add(time.Hour * 24 * 365 * 100),
-			CreatedAt: now,
-			UpdatedAt: now,
+			DefaultModel: mgm.DefaultModel{
+				DateFields: mgm.DateFields{
+					CreatedAt: now,
+					UpdatedAt: now,
+				},
+			},
 		})
 		return
 	}
@@ -111,7 +113,7 @@ func (e *Tenant) C() *mongo.Collection {
 // GetClientByDomain 获取租户的client
 func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAuth2Configure, error) {
 	if e.storeClient == nil {
-		e.storeClient = client.Store().GetClient()
+		e.storeClient = store_proto.GetClient()
 	}
 	resp, err := e.storeClient.Get(c, &pb.GetReq{Key: fmt.Sprintf("tenant_%s", domain)})
 	if err != nil {
@@ -128,7 +130,7 @@ func (e *Tenant) GetClientByDomain(c context.Context, domain string) (store.OAut
 // GetTenantByDomain 获取租户
 func (e *Tenant) GetTenantByDomain(c context.Context, domain string) error {
 	if e.storeClient == nil {
-		e.storeClient = client.Store().GetClient()
+		e.storeClient = store_proto.GetClient()
 	}
 	resp, err := e.storeClient.Get(c, &pb.GetReq{Key: fmt.Sprintf("tenant_%s", domain)})
 	if err != nil {
@@ -139,8 +141,8 @@ func (e *Tenant) GetTenantByDomain(c context.Context, domain string) error {
 }
 
 func (e *Tenant) InitStore() {
-	//todo 初始化所有租户到store
-	c := client.Store().GetClient()
+	//初始化所有租户到store
+	c := store_proto.GetClient()
 
 	cur, err := e.C().Find(context.TODO(), bson.M{})
 	if err != nil {
@@ -159,7 +161,7 @@ func (e *Tenant) InitStore() {
 			log.Fatal(err)
 		}
 		for _, domain := range tenant.Domains {
-			_, err = c.Set(ctx, &pb.SetReq{
+			_, err = c.Set(ctx, &storePB.SetReq{
 				Key:   fmt.Sprintf("tenant_%s", domain),
 				Value: string(rb),
 			})

@@ -1,57 +1,49 @@
-/*
- * @Author: lwnmengjing
- * @Date: 2022/3/10 13:47
- * @Last Modified by: lwnmengjing
- * @Last Modified time: 2022/3/10 13:47
- */
-
 package cfg
 
 import (
-	"embed"
-	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
 
 	log "github.com/mss-boot-io/mss-boot/core/logger"
 	"github.com/mss-boot-io/mss-boot/core/server"
+	"github.com/mss-boot-io/mss-boot/core/server/grpc"
 	"github.com/mss-boot-io/mss-boot/core/server/listener"
 	"github.com/mss-boot-io/mss-boot/pkg/config"
-	"github.com/mss-boot-io/mss-boot/pkg/config/mongodb"
 	"github.com/mss-boot-io/mss-boot/pkg/config/source"
+
+	"github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto/cfg"
 )
 
-var (
-	//go:embed *.yml
-	FS  embed.FS
-	Cfg Config
-)
+var Cfg Config
 
-// Config 配置
+// Config config
 type Config struct {
-	Logger   config.Logger    `yaml:"logger" json:"logger"`
-	Server   config.Listen    `yaml:"server" json:"server"`
-	Health   *config.Listen   `yaml:"health" json:"health"`
-	Metrics  *config.Listen   `yaml:"metrics" json:"metrics"`
-	Database mongodb.Database `yaml:"database" json:"database"`
-	OAuth2   config.OAuth2    `yaml:"oauth2" json:"oauth2"`
+	Logger   config.Logger  `yaml:"logger" json:"logger"`
+	Server   config.GRPC    `yaml:"server" json:"server"`
+	Health   *config.Listen `yaml:"health" json:"health"`
+	Metrics  *config.Listen `yaml:"metrics" json:"metrics"`
+	Cache    string         `yaml:"cache" json:"cache"`
+	Queue    string         `yaml:"queue" json:"queue"`
+	Locker   string         `yaml:"locker" json:"locker"`
+	Provider Provider       `yaml:"provider" json:"provider"`
 }
 
-func (e *Config) Init(handler http.Handler) {
+// Init init
+func (e *Config) Init(handler func(srv *grpc.Server)) {
 	opts := make([]source.Option, 0)
 	switch source.Provider(os.Getenv("config_source")) {
 	case source.FS:
 		opts = append(opts, source.WithProvider(source.FS),
-			source.WithFrom(FS))
-	case source.Local:
-		opts = append(opts, source.WithProvider(source.Local),
-			source.WithDir("cfg"))
+			source.WithFrom(cfg.FS))
 	case source.S3:
 		_, pwd, _, _ := runtime.Caller(1)
 		opts = append(opts, source.WithProvider(source.S3),
 			source.WithDir(filepath.Dir(pwd)),
 			source.WithProjectName("mss-boot"))
+	default:
+		opts = append(opts, source.WithProvider(source.Local),
+			source.WithDir("cfg"))
 	}
 	err := config.Init(e, opts...)
 	if err != nil {
@@ -59,11 +51,10 @@ func (e *Config) Init(handler http.Handler) {
 	}
 
 	e.Logger.Init()
-	e.Database.Init()
+	e.Provider.Init(e.Cache, e.Queue, e.Locker)
 
 	runnable := []server.Runnable{
-		listener.New("admin",
-			e.Server.Init(listener.WithHandler(handler))...),
+		e.Server.Init(handler, grpc.WithID("store")),
 	}
 	if e.Health != nil {
 		runnable = append(runnable, listener.NewHealthz(e.Health.Init()...))
@@ -77,6 +68,5 @@ func (e *Config) Init(handler http.Handler) {
 
 func (e *Config) OnChange() {
 	e.Logger.Init()
-	e.Database.Init()
 	log.Info("!!! cfg change and reload")
 }
