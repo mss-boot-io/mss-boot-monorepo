@@ -45,7 +45,7 @@ type Tenant struct {
 	Description      string         `json:"description" bson:"description"`
 	Domains          []string       `json:"domains" bson:"domains"`
 	Client           config.OAuth2  `json:"client" bson:"client"`
-	Metadata         interface{}    `json:"metadata" bson:"metadata"`
+	Metadata         any            `json:"metadata" bson:"metadata"`
 	ExpiredAt        time.Time      `json:"expiredAt" bson:"expiredAt" binding:"required"`
 	storeClient      pb.StoreClient `bson:"-"`
 }
@@ -58,7 +58,7 @@ func NewTenant(storeclient pb.StoreClient) *Tenant {
 	return &Tenant{storeClient: storeclient}
 }
 
-func (Tenant) TableName() string {
+func (*Tenant) TableName() string {
 	return "tenant"
 }
 

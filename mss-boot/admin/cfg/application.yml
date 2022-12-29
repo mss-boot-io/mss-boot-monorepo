@@ -18,7 +18,17 @@ logger:
 database:
   url: ''
   name: mss_boot_admin
-  casbin: true
+  casbinModel: |
+    [request_definition]
+    r = sub, dom, obj, act
+    [policy_definition]
+    p = sub, dom, obj, act
+    [role_definition]
+    g = _, _, _
+    [policy_effect]
+    e = some(where (p.eft == allow))
+    [matchers]
+    m = g(r.sub, p.sub, r.dom) && r.sub == p.sub && (keyMatch2(r.obj, p.obj) || keyMatch(r.obj, p.obj)) && (r.act == p.act || p.act == "*")
   timeout: 10s
 # 修改为部署的oauth2服务的配置
 oauth2:

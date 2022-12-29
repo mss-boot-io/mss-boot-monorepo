@@ -2,14 +2,17 @@ module github.com/mss-boot-io/mss-boot-monorepo/mss-boot/generator
 
 go 1.18
 
-replace github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto => ../store/store-proto
+replace (
+	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin => ../admin
+	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto => ../store/store-proto
+)
 
 require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/google/go-github/v41 v41.0.0
 	github.com/google/uuid v1.3.0
-	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin v0.0.0-20221020015004-2edff4be4164
+	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/admin v0.0.2-0.20221229071604-a359736424f3
 	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto v0.0.0-00010101000000-000000000000
 	github.com/mss-boot-io/mss-boot/core v0.0.4
 	github.com/mss-boot-io/mss-boot/pkg v0.0.6
@@ -45,7 +48,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.9 // indirect
 	github.com/aws/smithy-go v1.13.3 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/casdoor/casdoor-go-sdk v0.4.0 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/coreos/go-oidc/v3 v3.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -61,7 +63,6 @@ require (
 	github.com/go-playground/universal-translator v0.18.0 // indirect
 	github.com/go-playground/validator/v10 v10.10.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.1.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -82,8 +83,6 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
-	github.com/mss-boot-io/mss-boot/client v0.0.1 // indirect
-	github.com/mss-boot-io/mss-boot/proto v0.0.1 // indirect
 	github.com/opentracing/opentracing-go v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
