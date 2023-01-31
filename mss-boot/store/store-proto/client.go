@@ -28,15 +28,15 @@ func init() {
 	opts := make([]source.Option, 0)
 
 	switch source.Provider(os.Getenv("config_source")) {
-	case source.Local, source.FS:
-		// fixme: client not support local
-		opts = append(opts, source.WithProvider(source.FS),
-			source.WithFrom(cfg.FS))
 	case source.S3:
 		_, pwd, _, _ := runtime.Caller(0)
 		opts = append(opts, source.WithProvider(source.S3),
 			source.WithDir(filepath.Dir(pwd)),
 			source.WithProjectName("mss-boot"))
+	default:
+		// fixme: client not support local
+		opts = append(opts, source.WithProvider(source.FS),
+			source.WithFrom(cfg.FS))
 	}
 	err := config.Init(&cfg.Cfg, opts...)
 	if err != nil {

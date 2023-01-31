@@ -7,6 +7,7 @@ replace github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto => .
 require (
 	github.com/coreos/go-oidc/v3 v3.2.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/kamva/mgm/v3 v3.5.0
 	github.com/mss-boot-io/mss-boot-monorepo/mss-boot/store/store-proto v0.0.0-00010101000000-000000000000
 	github.com/mss-boot-io/mss-boot/core v0.0.4
 	github.com/mss-boot-io/mss-boot/pkg v0.0.6
@@ -57,7 +58,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
-	github.com/kamva/mgm/v3 v3.5.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/mailru/easyjson v0.7.6 // indirect

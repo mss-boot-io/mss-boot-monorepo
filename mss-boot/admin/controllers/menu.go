@@ -106,5 +106,5 @@ func (e Menu) List(c *gin.Context) {
 	e.DefaultController.List(c)
 }
 
-func (e *Menu) Other(r *gin.RouterGroup) {
+func (e Menu) Other(r *gin.RouterGroup) {
 }
